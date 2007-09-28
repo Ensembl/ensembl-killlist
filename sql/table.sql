@@ -5,14 +5,14 @@
 
 ################################################################################
 #
-# Table structure for table 'object'
+# Table structure for table 'kill_object'
 #
 
-CREATE TABLE object (
+CREATE TABLE kill_object (
 
-  object_id                   INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, 
+  kill_object_id              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, 
   taxon_id                    int(10) unsigned, 
-  mol_type                    ENUM('protein', 'cDNA', 'mRNA') NOT NULL,
+  mol_type                    ENUM('protein', 'cDNA', 'EST') NOT NULL,
   accession                   varchar(20),
   version                     varchar(20),
   external_db_id              int(11), 
@@ -20,7 +20,7 @@ CREATE TABLE object (
   created                     datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
   user_id                     INT(10) UNSIGNED NOT NULL, 
 
-  PRIMARY KEY (object_id),
+  PRIMARY KEY (kill_object_id),
   KEY species (taxon_id),
   KEY external_db (external_db_id),
   KEY user (user_id) 
@@ -31,16 +31,16 @@ CREATE TABLE object (
 
 ################################################################################
 #
-# Table structure for table 'object_reason'
+# Table structure for table 'kill_object_reason'
 #
 
-CREATE TABLE object_reason (
+CREATE TABLE kill_object_reason (
 
-  object_id               INT(10) UNSIGNED NOT NULL,
-  reason_id               SMALLINT(10) UNSIGNED NOT NULL,
+  kill_object_id          INT(10) UNSIGNED NOT NULL,
+  reason_id               INT(10) UNSIGNED NOT NULL,
 
-  PRIMARY KEY (object_id,reason_id),
-  KEY object (object_id),
+  PRIMARY KEY (kill_object_id,reason_id),
+  KEY kill_object (kill_object_id),
   KEY reason (reason_id)
 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
@@ -54,8 +54,9 @@ CREATE TABLE object_reason (
 
 CREATE TABLE reason (
 
-  reason_id               SMALLINT(10) UNSIGNED NOT NULL,
-  reason                  TEXT,
+  reason_id               INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  reason_description      VARCHAR(50) 
+  why                     TEXT,
 
   PRIMARY KEY (reason_id)
 
@@ -65,16 +66,16 @@ CREATE TABLE reason (
 
 ################################################################################
 #
-# Table structure for table 'object_analysis'
+# Table structure for table 'kill_object_analysis'
 #
 
-CREATE TABLE object_analysis (
+CREATE TABLE kill_object_analysis (
 
-  object_id           INT(10) UNSIGNED NOT NULL,
-  analysis_id         SMALLINT(10) UNSIGNED NOT NULL,
+  kill_object_id      INT(10) UNSIGNED NOT NULL,
+  analysis_id         INT(10) UNSIGNED NOT NULL, 
 
-  PRIMARY KEY (object_id,analysis_id),
-  KEY object (object_id),
+  PRIMARY KEY (kill_object_id,analysis_id),
+  KEY kill_object (kill_object_id),
   KEY analysis (analysis_id)
 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
@@ -148,11 +149,11 @@ CREATE TABLE species (
 CREATE TABLE species_allowed (
 
   taxon_id                    int(10) unsigned NOT NULL, 
-  object_id                   INT(10) UNSIGNED NOT NULL,
+  kill_object_id              INT(10) UNSIGNED NOT NULL,
 
-  PRIMARY KEY (taxon_id,object_id),
+  PRIMARY KEY (taxon_id,kill_object_id),
   KEY species (taxon_id),
-  KEY object (object_id)
+  KEY kill_object (kill_object_id)
 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
 
@@ -165,9 +166,10 @@ CREATE TABLE species_allowed (
 
 CREATE TABLE user (
 
-  user_id                     int(10) unsigned NOT NULL,
-  user_name                   varchar(20), 
-  full_name                   TEXT,
+  user_id                    int(10) unsigned NOT NULL AUTO_INCREMENT, 
+  user_name                  varchar(20), 
+  full_name                  TEXT,
+  email                      varchar(20),
   team_id                    int(10) unsigned NOT NULL,
 
   PRIMARY KEY (user_id),
@@ -184,11 +186,11 @@ CREATE TABLE user (
 
 CREATE TABLE team (
 
-  team_id                    int(10) unsigned NOT NULL,
+  team_id                    int(10) unsigned NOT NULL AUTO_INCREMENT,
   team_name                  varchar(50),
 
   PRIMARY KEY (team_id)
-
+ 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
 
 
@@ -199,15 +201,15 @@ CREATE TABLE team (
 
 CREATE TABLE comment (
 
-  log_id                  INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, 
+  comment_id              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, 
   user_id                 INT(10) UNSIGNED NOT NULL,
-  logtime                 datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-  object_id               INT(10) UNSIGNED NOT NULL,
-  log                     TEXT, 
+  time_added              datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+  kill_object_id          INT(10) UNSIGNED NOT NULL,
+  message                 TEXT, 
   
-  PRIMARY KEY (log_id),
+  PRIMARY KEY (comment_id),
   KEY user (user_id),
-  KEY object (object_id)
+  KEY kill_object (kill_object_id)
 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
 
