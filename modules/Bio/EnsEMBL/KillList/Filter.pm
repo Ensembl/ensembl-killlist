@@ -82,6 +82,9 @@ sub get_all_Species_allowed {
   if (!defined $self->{'_for_species_array'} && defined $self->adaptor()) {
     $self->{'_for_species_array'} = $self->adaptor()->db()->get_SpeciesAdaptor()->fetch_all_by_KillObject($self);
   }
+  if (!defined $self->{'_for_species_array'} && defined $self->adaptor()) {
+    $self->{'_for_species_array'} = $self->adaptor()->db()->get_SpeciesAdaptor()->fetch_all_by_dbID($self);
+  }
   return $self->{'_for_species_array'};
 }
 
