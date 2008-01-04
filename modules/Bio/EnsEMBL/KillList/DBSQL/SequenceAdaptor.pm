@@ -57,7 +57,7 @@ sub store {
   my $db = $self->db();
 
   if ($sequence_obj->is_stored($db)) {
-    print STDERR "already stored this Sequence"; 
+    print STDERR "already stored this Sequence\n"; 
     return $sequence_obj->dbID();
   }
 
