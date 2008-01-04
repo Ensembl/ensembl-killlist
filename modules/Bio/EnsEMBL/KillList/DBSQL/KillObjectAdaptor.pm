@@ -814,7 +814,7 @@ sub store {
   $sth->finish();
 
   my $kill_obj_dbID = $sth->{'mysql_insertid'};
-print STDERR "kill_object_id = $kill_obj_dbID\n";
+  print STDERR "kill_object_id = $kill_obj_dbID\n";
   # add the reasons
   foreach my $reason (@{$reasons}) {
     $sth = $self->prepare("INSERT INTO kill_object_reason".
@@ -878,7 +878,7 @@ print STDERR "kill_object_id = $kill_obj_dbID\n";
   $original->dbID($kill_obj_dbID);
 
   $self->set_status( $obj_to_store, $status);
-  print STDERR "Entry ".$original->accession." with dbID ".$original->dbID." has status $status\n";
+  print STDERR "Entry ".$original->accession." with dbID ".$original->dbID." has been stored with status $status\n";
   return $kill_obj_dbID;
 }
 
@@ -891,7 +891,7 @@ sub remove {
     throw("Bio::EnsEMBL::KillList::KillObject argument expected.");
   }
 
-  if ( !$obj->db->get_KillObjectAdaptor->accession_stored($obj) ) {
+  if ( !$self->accession_stored($obj) ) {
     warning("Cannot remove obj with dbID [" . $obj->dbID() . "] as it is not stored in " .
             "this database.");
     return;
@@ -912,10 +912,10 @@ sub remove {
   $obj->adaptor(undef);
 
   # now store the object with a 'removed' status
-  $self->store($obj, "REMOVED");
+  my $new_dbid = $self->store($obj, "REMOVED");
 
   print STDERR "Remove successful.\n";
-  return;
+  return $new_dbid;
 }
 
 sub update {
@@ -954,9 +954,9 @@ sub update {
   $kill_object->adaptor(undef);
 
   # now store the object with a 'removed' status
-  $self->store($kill_object, "UPDATED");
+  my $new_dbid = $self->store($kill_object, "UPDATED");
 
-  return;
+  return $new_dbid;
 }
 
 sub was_removed {
