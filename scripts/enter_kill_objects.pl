@@ -43,7 +43,7 @@ use Bio::EnsEMBL::Utils::Exception qw(throw deprecate warning);
 #Modify things before running: 
 
 # check these are the latest versions:
-my @mole_dbnames = ('embl_90','refseq_22','uniprot_10_4','embl_89','refseq_21','uniprot_10_3'); 
+my @mole_dbnames; # = ('refseq_26','uniprot_12_6','embl_92','embl_89','refseq_25','uniprot_12_5','uniprot_9_3'); 
 
 #No custom modification should be needed below this line
 #===============================
@@ -118,6 +118,11 @@ if (!@reasons) {
   die "ERROR: Please set at least on reason for this entry\n";
 }
 
+if (!@mole_dbnames) {
+  die "Please enter a list of -mole_dbnames\n";
+
+}
+
 # split up the arrays
 if (scalar(@reasons)) {
   @reasons = split(/,/,join(',',@reasons));
@@ -127,6 +132,9 @@ if (scalar(@for_genebuild_species)) {
 }
 if (scalar(@for_genebuild_analyses)) {
   @for_genebuild_analyses = split(/,/,join(',',@for_genebuild_analyses));
+}
+if (scalar(@mole_dbnames)) {
+  @mole_dbnames = split(/,/,join(',',@mole_dbnames));
 }
 
 # connect to kill_list db
