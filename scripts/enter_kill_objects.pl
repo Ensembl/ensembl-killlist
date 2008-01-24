@@ -5,12 +5,14 @@
 # can be found in the Mole db, the entry is stored in the 
 # ensembl_kill_list database. 
 
+# To find the latest Mole dbanmes, do:
+# mysql -ugenero -hcbi3 -Dmm_ini -e "select database_name from ini where available='yes'"
 
 # Tag the following optional parameters on to the commandline too:
 # -for_genebuild_species, -for_genebuild_analyses, -comment
  
 # The command will look something like this:
-#  perl enter_kill_objects.pl -killer 4 -file info.ls \
+#  perl enter_kill_objects.pl -killer myname -file info.ls \
 #  -dbuser ensadmin -dbpass xxx -reasons Repetitive,Short -for_genebuild_species \
 #  10090,9606 -for_genebuild_analyses xlaevis_cDNA,Vertrna -comment 'this is bad'
 
@@ -355,8 +357,11 @@ foreach my $accession_version (@accessions) {
 }
 
 
+my @stored;
+my @not_stored;
 print STDERR "Have ".scalar(@evidence_to_store)." new kill_list objects to store\n";
 foreach my $new_evidence (@evidence_to_store) {
+  my $evidence_dbID;
   print STDERR "Storing new evidence: \n".
                "  user             : ".$new_evidence->user->dbID    ."\n".
                "  accession        : ".$new_evidence->accession     ."\n".
@@ -368,9 +373,27 @@ foreach my $new_evidence (@evidence_to_store) {
                "  description      : ".$new_evidence->description   ."\n";
   print Dumper($new_evidence);
 
-  my $evidence_dbID = $kill_adaptor->store($new_evidence, 0, 1);
-  print_stored($db, $evidence_dbID);
+  eval {
+    $evidence_dbID = $kill_adaptor->store($new_evidence, 0, 1);
+  };
+  if ($@) {
+    push @not_stored, $new_evidence->accession;
+    warning("Unable to store ".$new_evidence->accession."\n".$@); 
+  } else {
+    push @stored,$new_evidence->accession;
+    print_stored($db, $evidence_dbID);
+  }
 }
+
+print "\nStored accessions:\n==================\n";
+foreach my $s (@stored) {
+    print "$s\n";
+}
+print "\nAccessions not stored:\n======================\n";
+foreach my $ns (@not_stored) {
+  print "$ns\n";
+}
+
 
 sub get_check_user {
   my ($user_adaptor, $username, $check) = @_;
