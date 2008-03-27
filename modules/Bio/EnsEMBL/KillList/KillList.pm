@@ -5,7 +5,7 @@ use warnings;
 
 use Data::Dumper;
 
-use Bio::EnsEMBL::Pipeline::Config::GeneBuild::KillListFilter;
+use Bio::EnsEMBL::Analysis::Config::GeneBuild::KillListFilter;
 use Bio::EnsEMBL::Analysis::Tools::Utilities;
 use Bio::EnsEMBL::KillList::AnalysisLite;
 use Bio::EnsEMBL::KillList::Comment;
