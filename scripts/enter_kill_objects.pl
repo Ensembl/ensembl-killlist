@@ -31,12 +31,12 @@ use Bio::EnsEMBL::KillList::Team;
 use Bio::EnsEMBL::KillList::User;
 use Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;
 
-use Bio::EnsEMBL::Mole::Accession;
-use Bio::EnsEMBL::Mole::DBXref;
-use Bio::EnsEMBL::Mole::Description;
-use Bio::EnsEMBL::Mole::Entry;
-use Bio::EnsEMBL::Mole::Taxonomy;
-use Bio::EnsEMBL::Mole::DBSQL::DBAdaptor;
+use Bio::EnsEMBL::ExternalData::Mole::Accession;
+use Bio::EnsEMBL::ExternalData::Mole::DBXref;
+use Bio::EnsEMBL::ExternalData::Mole::Description;
+use Bio::EnsEMBL::ExternalData::Mole::Entry;
+use Bio::EnsEMBL::ExternalData::Mole::Taxonomy;
+use Bio::EnsEMBL::ExternalData::Mole::DBSQL::DBAdaptor;
 
 use Bio::EnsEMBL::Utils::Exception qw(throw deprecate warning);
 
@@ -151,7 +151,7 @@ my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new(
 # connect to mole dbs 
 my @mole_dbs;
 foreach my $mole_dbname (@mole_dbnames) {
-  my $db = Bio::EnsEMBL::Mole::DBSQL::DBAdaptor->new(
+  my $db = Bio::EnsEMBL::ExternalData::Mole::DBSQL::DBAdaptor->new(
         '-dbname' => $mole_dbname,
         '-host'   => $mole_dbhost,
         '-user'   => $mole_dbuser,
