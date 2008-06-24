@@ -564,6 +564,9 @@ sub set_status {
   if( ! defined ($kill_object_id = $kill_object->dbID)) {
     throw( "Kill_object has to be in database" );
   }
+  if ($status ne 'CREATED' && $status ne 'UPDATED' && $status ne 'REINSTATED' && $status new 'REMOVED') { 
+    throw("Status '$status' not in CREATED, UPDATED, REINSTATED, REMOVED.");
+  }
 
   eval {
     my $sth_insert = $self->prepare(
@@ -764,9 +767,7 @@ sub store {
   } else {
     #store new
     $obj_to_store = $obj;
-    if (!$status) {
-      $status = "CREATED";
-    } 
+    $status = "CREATED";
   } 
   print STDOUT "THIS IS THE UNION\n" if ($stored_dbID);
   print STDOUT Dumper($obj_to_store);
