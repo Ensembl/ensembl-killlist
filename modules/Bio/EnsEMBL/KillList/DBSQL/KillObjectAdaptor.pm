@@ -557,14 +557,14 @@ sub fetch_by_Status {
 }
 
 sub set_status {
-  my ($self, $kill_object, $stat_str) = @_;
+  my ($self, $kill_object, $status) = @_;
   my $kill_object_id;
-  my $status;
+  #my $status;
 
   if( ! defined ($kill_object_id = $kill_object->dbID)) {
     throw( "Kill_object has to be in database" );
   }
-  if ($status ne 'CREATED' && $status ne 'UPDATED' && $status ne 'REINSTATED' && $status new 'REMOVED') { 
+  if ($status ne 'CREATED' && $status ne 'UPDATED' && $status ne 'REINSTATED' && $status ne 'REMOVED') { 
     throw("Status '$status' not in CREATED, UPDATED, REINSTATED, REMOVED.");
   }
 
@@ -576,15 +576,15 @@ sub set_status {
                               );
 
     $sth_insert->bind_param(1, $kill_object->dbID, SQL_INTEGER);
-    $sth_insert->bind_param(2, $stat_str, SQL_VARCHAR);
+    $sth_insert->bind_param(2, $status, SQL_VARCHAR);
     $sth_insert->execute();
     $sth_insert->finish;
   };
   if ($@) {
     print( " $@ " );
-    throw("Error while setting status to $stat_str");
+    throw("Error while setting status to $status");
   } else {
-    return $stat_str;
+    return $status;
   }
 }
 
@@ -719,7 +719,10 @@ sub store {
   my ($self, $obj, $status, $force) = @_;
   my ($obj_to_store, $original); 
   my $db = $self->db();
- 
+
+  #print "OJB: ", $obj,"\nStatus: ",$status,"\n";
+
+
   # check that this is a KillObject
   if (!ref $obj || !$obj->isa('Bio::EnsEMBL::KillList::KillObject') ) {
     throw("Must store a KillObject object, not a $obj");
@@ -877,6 +880,7 @@ sub store {
   # transferred copy
   $original->adaptor($self);
   $original->dbID($kill_obj_dbID);
+#  print "OBJ to store: ", $obj_to_store,"\nStatus: ",$status,"\n";
 
   $self->set_status( $obj_to_store, $status);
   print STDERR "Entry ".$original->accession." with dbID ".$original->dbID." has been stored with status $status\n";
