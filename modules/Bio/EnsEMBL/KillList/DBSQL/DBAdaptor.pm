@@ -46,7 +46,6 @@ use Bio::EnsEMBL::DBSQL::DBAdaptor;
 
 @ISA = qw( Bio::EnsEMBL::DBSQL::DBAdaptor );
 
-warn("\n\nUsing Bronwen's DBAdaptor\n\n");
 
 
 sub get_available_adaptors {
