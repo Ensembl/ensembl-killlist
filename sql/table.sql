@@ -55,7 +55,7 @@ CREATE TABLE kill_object_reason (
 CREATE TABLE reason (
 
   reason_id               INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  reason_description      VARCHAR(50) 
+  reason_description      VARCHAR(50), 
   why                     TEXT,
 
   PRIMARY KEY (reason_id)
