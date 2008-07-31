@@ -107,9 +107,9 @@ CREATE TABLE analysis (
 
 CREATE TABLE external_db (
 
-  external_db_id              INT(10) UNSIGNED NOT NULL,
-  db_name                     VARCHAR(27) NOT NULL,
-  db_release                  VARCHAR(40) NOT NULL,
+  external_db_id              SMALLINT UNSIGNED NOT NULL,
+  db_name                     VARCHAR(28) NOT NULL,
+  db_release                  VARCHAR(255),
   status                      ENUM('KNOWNXREF','KNOWN','XREF','PRED','ORTH',
                                    'PSEUDO')
                               NOT NULL,
@@ -117,7 +117,9 @@ CREATE TABLE external_db (
   display_label_linkable      BOOLEAN DEFAULT 0 NOT NULL,
   priority                    INT NOT NULL,
   db_display_name             VARCHAR(255),
-  allowed                     BOOLEAN NOT NULL DEFAULT 0,
+  type                        ENUM('ARRAY', 'ALT_TRANS', 'MISC', 'LIT', 'PRIMARY_DB_SYNONYM'),
+  secondary_db_name           VARCHAR(255) DEFAULT NULL,
+  secondary_db_table          VARCHAR(255) DEFAULT NULL,
 
   PRIMARY KEY (external_db_id)
 
