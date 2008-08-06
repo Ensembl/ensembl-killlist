@@ -40,7 +40,7 @@ CREATE TABLE kill_object (
 CREATE TABLE sequence (
 
   kill_object_id          INT(10) UNSIGNED NOT NULL,
-  sequence                TEXT,
+  sequence                TEXT NOT NULL,
 
   PRIMARY KEY (kill_object_id)
 
