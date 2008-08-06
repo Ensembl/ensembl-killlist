@@ -12,7 +12,7 @@ CREATE TABLE kill_object (
 
   kill_object_id              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, 
   taxon_id                    int(10) unsigned, 
-  mol_type                    ENUM('protein', 'cDNA', 'EST') NOT NULL,
+  mol_type                    ENUM('protein', 'cDNA', 'EST', 'genomic DNA') NOT NULL,
   accession                   varchar(20),
   version                     varchar(20),
   external_db_id              int(11), 
