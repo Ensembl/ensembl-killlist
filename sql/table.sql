@@ -12,18 +12,56 @@ CREATE TABLE kill_object (
 
   kill_object_id              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, 
   taxon_id                    int(10) unsigned, 
-  mol_type                    ENUM('protein', 'cDNA', 'EST', 'genomic DNA') NOT NULL,
+  mol_type                    ENUM('protein','cDNA','EST','genomic DNA', 'unassigned DNA', 
+                                   'DNA','ss-DNA','RNA','genomic RNA','ds-RNA','ss-cRNA',
+                                   'ss-RNA','tRNA','rRNA','snoRNA','snRNA','scRNA',
+                                   'pre-RNA','other RNA','other DNA','unassigned RNA',
+                                   'viral cRNA','cRNA') NOT NULL,
   accession                   varchar(20),
   version                     varchar(20),
   external_db_id              int(11), 
   description                 TEXT,
-  created                     datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
   user_id                     INT(10) UNSIGNED NOT NULL, 
 
   PRIMARY KEY (kill_object_id),
   KEY species (taxon_id),
   KEY external_db (external_db_id),
   KEY user (user_id) 
+
+) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+
+
+
+################################################################################
+#
+# Table structure for table 'sequence'
+#
+
+CREATE TABLE sequence (
+
+  kill_object_id          INT(10) UNSIGNED NOT NULL,
+  sequence                TEXT,
+
+  PRIMARY KEY (kill_object_id)
+
+) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+
+
+
+################################################################################
+#
+# Table structure for table 'kill_object_status'
+#
+
+CREATE TABLE kill_object_status (
+
+  kill_object_id          INT(10) UNSIGNED NOT NULL,
+  status                  ENUM('CREATED','UPDATED','REINSTATED','REMOVED')
+                          DEFAULT 'CREATED' NOT NULL, 
+  time                    datetime DEFAULT '0000-00-00 00:00:00' NOT NULL, 
+  is_current              BOOLEAN DEFAULT 1 NOT NULL, 
+
+  PRIMARY KEY (kill_object_id)
 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
 
@@ -126,6 +164,7 @@ CREATE TABLE external_db (
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
 
 
+
 ################################################################################
 #
 # Table structure for table 'species'
@@ -207,7 +246,7 @@ CREATE TABLE comment (
   user_id                 INT(10) UNSIGNED NOT NULL,
   time_added              datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
   kill_object_id          INT(10) UNSIGNED NOT NULL,
-  message                 TEXT, 
+  message                 TEXT NOT NULL, 
   
   PRIMARY KEY (comment_id),
   KEY user (user_id),
