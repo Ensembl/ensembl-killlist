@@ -6,7 +6,7 @@
 # ensembl_kill_list database. 
 
 # To find the latest Mole dbanmes, do:
-# mysql -ugenero -hcbi3 -Dmm_ini -e "select database_name from ini where available='yes'"
+# mysql -ugenero -hcbi3 -Dmm_ini -e "select database_name from ini where available='yes' and current = 'yes'"
 
 # Tag the following optional parameters on to the commandline too:
 # -for_genebuild_species, -for_genebuild_analyses, -comment
