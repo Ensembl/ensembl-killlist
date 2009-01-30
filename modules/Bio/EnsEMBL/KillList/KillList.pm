@@ -3,9 +3,11 @@ package Bio::EnsEMBL::KillList::KillList;
 use strict;
 use warnings;
 
+
 use Data::Dumper;
 
-use Bio::EnsEMBL::Analysis::Config::GeneBuild::KillListFilter;
+use Bio::EnsEMBL::Analysis::Config::GeneBuild::KillListFilter; 
+use Bio::EnsEMBL::Analysis::Config::Databases;
 use Bio::EnsEMBL::Analysis::Tools::Utilities;
 use Bio::EnsEMBL::KillList::AnalysisLite;
 use Bio::EnsEMBL::KillList::Comment;
@@ -49,7 +51,7 @@ sub new {
 
   if (!defined($type)) {throw " ERROR: need to set -type\n";}
   $self->type          ( $type );
-  $self->ref_db        ( $gb_ref_db ) if ( defined $gb_ref_db );
+  $self->ref_db        ( $gb_ref_db ) if ( defined $gb_ref_db ); #check this 
   $self->KILL_LIST_DB  ( $kill_list_db ) if ( defined $kill_list_db );
   $self->FILTER_PARAMS ( $filter_params ) if ( defined $filter_params );
 
@@ -87,13 +89,13 @@ sub type {
 
 =cut
 sub GB_REF_DB {
-  my ($self, $ref_db) = @_;
+  my ($self, $ref_db) = @_; 
+
   if ( !$self->{'GB_REF_DB'} ) {
     $self->{'GB_REF_DB'} = {};
-  }
+  } 
+
   if ( $ref_db ) {
-    throw("Must pass KillList:GB_REF_DB a hashref not a ".$ref_db)
-      unless(ref($ref_db) eq 'HASH');
     $self->{'GB_REF_DB'} = $ref_db;
   }
   return $self->{'GB_REF_DB'};
@@ -117,12 +119,12 @@ sub KILL_LIST_DB {
     $self->{'KILL_LIST_DB'} = {};
   }
   if ( $db_params ) {
-    throw("Must pass KillList:KILL_LIST_DB a hashref not a ".$db_params)
-      unless(ref($db_params) eq 'HASH');
     $self->{'KILL_LIST_DB'} = $db_params; 
   }
   return $self->{'KILL_LIST_DB'};
 }
+
+
 
 =head2
 
@@ -228,16 +230,14 @@ sub read_and_check_config {
 
 =cut
 sub get_kill_list {
-  my ($self) = @_;
+  my ($self) = @_; 
 
-  #connect to the kill_list db
-  my %db_try = %{$self->KILL_LIST_DB};
-  if (!defined($db_try{'-dbname'}) || !defined($db_try{'-host'}) 
-      || !defined($db_try{'-port'}) || !defined($db_try{'-user'}) || !defined($db_try{'-pass'}) ) {
-    throw("Error with \$KILL_LIST_DB. Please enter -dbname, -host, -port, -user and -pass.");
-  }
-  my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new(
-          %db_try); 
+ my $kill_list_db_name = $self->KILL_LIST_DB ; 
+ print "\nUsing kill-list-db : ".  $$DATABASES{$self->KILL_LIST_DB}{"-dbname"} . " ";   
+ print "\@ ".  $$DATABASES{$self->KILL_LIST_DB}{"-host"} . "\n";    
+
+ my $db = new Bio::EnsEMBL::KillList::DBSQL::DBAdaptor( %{ $$DATABASES{$self->KILL_LIST_DB} }) ;
+
 
   #connect to the reference db
 #  my %ref_db_try = %{$self->GB_REF_DB};
