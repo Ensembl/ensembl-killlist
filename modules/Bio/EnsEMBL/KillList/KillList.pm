@@ -230,25 +230,15 @@ sub read_and_check_config {
 
 =cut
 sub get_kill_list {
-  my ($self) = @_; 
+  my ($self) = @_;
 
- my $kill_list_db_name = $self->KILL_LIST_DB ; 
- print "\nUsing kill-list-db : ".  $$DATABASES{$self->KILL_LIST_DB}{"-dbname"} . " ";   
- print "\@ ".  $$DATABASES{$self->KILL_LIST_DB}{"-host"} . "\n";    
+print "\nUsing kill-list-db : "
+    . $DATABASES->{KILL_LIST_DB}->{"-dbname"}
+    . " \@ "
+    . $DATABASES->{KILL_LIST_DB}->{"-host"} . "\n";
 
- my $db = new Bio::EnsEMBL::KillList::DBSQL::DBAdaptor( %{ $$DATABASES{$self->KILL_LIST_DB} }) ;
+my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $DATABASES->{KILL_LIST_DB} }) ;
 
-
-  #connect to the reference db
-#  my %ref_db_try = %{$self->GB_REF_DB};
-#    if (!defined($ref_db_try{'-dbname'}) || !defined($ref_db_try{'-host'})
-#      || !defined($ref_db_try{'-port'}) || !defined($ref_db_try{'-user'}) || !defined($ref_db_try{'-pass'}) ) {
-#    throw("Error with \$GB_REF_DB. Please enter -dbname, -host, -port, -user and -pass.");
-#  }
-#  my $ref_db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new(
-#          %ref_db_try);
-
- 
   #get the kill_list filter
   my %filter_params = %{$self->FILTER_PARAMS};
 #  foreach my $key (keys %filter_params) {
