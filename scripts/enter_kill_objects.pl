@@ -177,8 +177,7 @@ if (defined $file) {
   open(INFILE, "<$file") or die ("Can't read $file $! \n");
   while(<INFILE>){
     chomp;
-    my @fields = split('\t', $_); 
-    # or split('\s+', $_) might be better
+    my @fields = split('\s+', $_); 
     my $accession_version = $fields[0];
   
     # this is extra stuff that we don't use
