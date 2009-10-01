@@ -117,7 +117,7 @@ if ( defined $file && defined $accession) {
 }
 
 if (!@reasons) {
-  die "ERROR: Please set at least on reason for this entry\n";
+  die "ERROR: Please set at least one reason for this entry\n";
 }
 
 if (!@mole_dbnames) {
