@@ -370,7 +370,6 @@ foreach my $new_evidence (@evidence_to_store) {
                "  external_db_id   : ".$new_evidence->external_db_id."\n".
                "  sequence         : ".$new_evidence->sequence->sequence      ."\n".
                "  description      : ".$new_evidence->description   ."\n";
-  print Dumper($new_evidence);
 
   eval {
     $evidence_dbID = $kill_adaptor->store($new_evidence, 0, 1);
