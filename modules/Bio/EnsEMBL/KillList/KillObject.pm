@@ -294,7 +294,7 @@ sub add_Analysis_allowed {
   unless(defined $analysis && ref $analysis 
          && $analysis->isa("Bio::EnsEMBL::KillList::AnalysisLite")) {
     throw("Analysis [$analysis] not a " .
-          "Bio::EnsEMBL::KillList::Analysis");
+          "Bio::EnsEMBL::KillList::AnalysisLite");
   }
 
   $self->{'_analysis_array'} ||= [];
