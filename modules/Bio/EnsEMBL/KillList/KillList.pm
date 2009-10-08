@@ -38,7 +38,7 @@ use vars qw (@ISA);
 
 =cut
 sub new {
-  my($class,@args) = @_;
+  my($class,@args) = @_; 
 
   my $self = bless {},$class;
 
@@ -232,13 +232,10 @@ sub read_and_check_config {
 sub get_kill_list {
   my ($self) = @_;
 
-print "\nUsing kill-list-db : "
-    . $DATABASES->{KILL_LIST_DB}->{"-dbname"}
-    . " \@ "
-    . $DATABASES->{KILL_LIST_DB}->{"-host"} . "\n";
+  print "\nUsing kill-list-db : " . $DATABASES->{KILL_LIST_DB}->{"-dbname"} . " \@ " . $DATABASES->{KILL_LIST_DB}->{"-host"} . "\n";
 
-my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $DATABASES->{KILL_LIST_DB} }) ;
-
+  my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $DATABASES->{KILL_LIST_DB} }) ;
+  $db->disconnect_when_inactive(1); 
   #get the kill_list filter
   my %filter_params = %{$self->FILTER_PARAMS};
 #  foreach my $key (keys %filter_params) {
@@ -251,8 +248,7 @@ my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $DATABASES->{KILL_LIS
 #  }
   #my $filter = Bio::EnsEMBL::KillList::Filter->new(%filter_params);
 
-  #get objects where required
-  my $user = $db->get_UserAdaptor->fetch_by_user_name($filter_params{'-user_name'}) if ($filter_params{'-user_name'});
+  #get objects where required 
   my $source_spp = $db->get_SpeciesAdaptor->fetch_by_dbID($filter_params{'-source_species'}) if ($filter_params{'-source_species'});
   my $date = $filter_params{'-before_date'};
   my $status = $filter_params{'-having_status'};
@@ -271,7 +267,12 @@ my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $DATABASES->{KILL_LIS
   }
   foreach my $id (@{$filter_params{'-for_external_db_ids'}}) {
     push @external_db_ids, $id;
-  }
+  } 
+
+  my $user ;
+  # I uncommented the 'get_uesrAdaptor as in production a user will be fetched for every entry in the killList, 
+  # which gives too much overhead. user is not used in filter() anyway. but a fix would be good to lazy-load this.  
+  #$user = $db->get_UserAdaptor->fetch_by_user_name($filter_params{'-user_name'}) if ($filter_params{'-user_name'});
   #make the filter
   my $filter = Bio::EnsEMBL::KillList::Filter->new(
                -user                    => $user,
