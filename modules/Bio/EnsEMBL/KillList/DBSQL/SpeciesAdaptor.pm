@@ -81,8 +81,9 @@ sub _objs_from_sth {
   my ($self, $sth) = @_;
 
   my @out;
-  my ( $taxon_id, $name, $name_class );
-  $sth->bind_columns( \$taxon_id, \$name, \$name_class );
+  my ( $taxon_id, $name, $name_class );  
+
+  $sth->bind_columns( \$taxon_id, \$name, \$name_class ); 
 
   while($sth->fetch()) {
     #print STDERR "$taxon_id, $name, $name_class\n";
