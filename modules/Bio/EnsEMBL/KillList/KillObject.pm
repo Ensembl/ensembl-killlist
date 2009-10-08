@@ -17,7 +17,6 @@ package Bio::EnsEMBL::KillList::KillObject;
 
 use strict;
 use Bio::EnsEMBL::Storable;
-use Bio::EnsEMBL::KillList::DBSQL::KillObjectAdaptor;
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);
 use Bio::EnsEMBL::Utils::Exception qw(throw deprecate warning);
 use vars qw(@ISA);
@@ -31,37 +30,62 @@ sub new {
   my $class = ref($caller) || $caller;
   my $self = $class->SUPER::new(@_);
 
-  my ($object_id, $mol_type, $taxon, $user,
+  my ($object_id, $mol_type, $taxonObj, $userObj,
       $accession, $version, $external_db_id,
       $description, $sequence, 
-      $reasons, $analyses, $species_allowed, $comments) = 
+      $reasons, $analyses, $species_allowed, $comments,$kill_list_dbadaptor,$user_id,$taxon_id) = 
       rearrange( ['DBID','MOL_TYPE', 'TAXON', 'USER', 
                   'ACCESSION','VERSION','EXTERNAL_DB_ID',
                   'DESCRIPTION', 'SEQUENCE', 
-                  "REASONS", "ANALYSES", "SPECIES_ALLOWED", "COMMENTS"], @_ );
+                  "REASONS", "ANALYSES", "SPECIES_ALLOWED", 
+                  "COMMENTS","KILL_LIST_DBADAPTOR","USER_ID","TAXON_ID"], @_ );
+
+
 
  if (!defined($mol_type)) {throw " ERROR: need to set -mol_type\n";}
  if (!defined($external_db_id)) {throw " ERROR: need to set -external_db_id\n";}
- if (!defined($taxon)) {throw " ERROR: need to set -taxon\n";}
- if (!defined($user)) {throw " ERROR: need to set -user\n";}
+ #if (!defined($taxon)) {throw " ERROR: need to set -taxon\n";}  
+ 
+ 
  if (!defined($accession)) {throw " ERROR: need to set -accession\n";}
 
-  if (!defined($mol_type)  || !defined($accession) || !$user || !$taxon || 
-      !defined($external_db_id) ) {
-    throw " ERROR: need to set -mol_type, -accession, -external_db_id, -user, and -taxon ";
+  if (!defined($mol_type)  || !defined($accession)  ||  !defined($external_db_id) ) {
+    throw " ERROR: need to set -mol_type, -accession, -external_db_id  and -taxon ";
   }
 
-  if(!ref($user) || !$user->isa('Bio::EnsEMBL::KillList::User')) {
-    throw('-USER argument must be a Bio::EnsEMBL::User not '.
-          $user);
-  }
-  $self->user($user);
+  if ( $userObj ) {
+    if(!ref($userObj) || !$userObj->isa('Bio::EnsEMBL::KillList::User')) { 
+      throw("User has to be an Object of type Bio::EnsEMBL::KillList::User\n") ;  
+    }
+    $self->user($userObj); 
+  } 
 
-  if(!ref($taxon) || !$taxon->isa('Bio::EnsEMBL::KillList::Species')) {
-    throw('-TAXON argument must be a Bio::EnsEMBL::Species not '.
-          $taxon);
+  if ( $user_id ) { 
+     $self->user_id($user_id);     
+  } 
+
+
+  #my $sa = $self->db->get_SpeciesAdaptor();
+  #print $sa . "\n";
+
+  # setting kill list db adaptor to lazy-load user / taxon  
+  if ( $kill_list_dbadaptor ) {  
+    $self->kill_list_dbadaptor($kill_list_dbadaptor); 
+  } 
+
+  if ( $taxonObj ) { 
+     if(!ref($taxonObj) || !$taxonObj->isa('Bio::EnsEMBL::KillList::Species')) {
+       throw('-TAXON argument must be a Bio::EnsEMBL::Species not '.  $taxonObj);
+     } else { 
+       $self->taxon($taxonObj); 
+     }  
   }
-  $self->taxon($taxon);
+  if ( $taxon_id ) { 
+     $self->taxon_id($taxon_id) ; 
+  } 
+
+
+
 
   $self->mol_type( $mol_type );
   $self->accession( $accession );
@@ -96,39 +120,93 @@ sub new {
   return $self;
 }
 
-sub user {
-  my $self = shift;
 
-  if(@_) {
-    my $usr = shift;
-    if(defined($usr) && (!ref($usr) || !$usr->isa('Bio::EnsEMBL::KillList::User'))) {
+sub user {
+  my ($self,$usr) = @_ ; 
+  # setting user by argument  
+  
+  if($usr) { 
+    if(!ref($usr) || !$usr->isa('Bio::EnsEMBL::KillList::User')) { 
       throw('user argument must be a Bio::EnsEMBL::User');
     }
     $self->{'user'} = $usr;
-  }
+  } 
 
+
+  unless ( $self->{'user'} ) {  
+    if ( $self->user_id ) {  
+      my $ua  =  $self->kill_list_dbadaptor()->get_UserAdaptor(); 
+      my $user = $ua->fetch_by_dbID($self->user_id);  
+      if ( $user ) { 
+         $self->{'user'} = $user ;  
+      } else { 
+        throw("user with id " . $self->user_id . "  can't be found\n" ) ; 
+      }
+    }  
+  }
   return $self->{'user'};
 }
 
 sub taxon {
-  my $self = shift;
+  my (  $self, $spp ) = @_ ;  
 
-  if(@_) {
-    my $spp = shift;
-    if(defined($spp) && (!ref($spp) || !$spp->isa('Bio::EnsEMBL::KillList::Species'))) {
-      throw('taxon argument must be a Bio::EnsEMBL::Species');
-    }
-    $self->{'taxon'} = $spp;
+  if(defined($spp) && (!ref($spp) || !$spp->isa('Bio::EnsEMBL::KillList::Species'))) {
+     throw('taxon argument must be a Bio::EnsEMBL::Species');
+  } else { 
+     $self->{'taxon'} = $spp;
+  } 
+
+  # no taxon object but taxon_id  
+  unless ( $self->{taxon} ) {  
+    if ( $self->taxon_id ) { 
+      my $sa  =  $self->kill_list_dbadaptor()->get_SpeciesAdaptor(); 
+      my $taxonObj  = $sa->fetch_by_dbID($self->taxon_id) ; 
+      if ( $taxonObj ) { 
+         $self->{'taxon'} = $taxonObj ;  
+      } else { 
+        throw("Taxon with id " . $self->taxon_id. "  can't be found\n" ) ; 
+      }
+    }   
   }
-
   return $self->{'taxon'};
 }
 
 sub mol_type {
-  my $self = shift;
-  $self->{'mol_type'} = shift if( @_ );
+  my ($self,$type ) = @_ ;  
+
+  if ( $type ) { 
+    $self->{'mol_type'} = $type ;  
+   } 
   return $self->{'mol_type'};
 }
+
+sub user_id {
+  my ($self,$type ) = @_ ;  
+
+  if ( $type ) { 
+    $self->{'user_id'} = $type ;  
+   } 
+  return $self->{'user_id'};
+} 
+
+
+sub taxon_id {
+  my ($self,$type ) = @_ ;  
+
+  if ( $type ) { 
+    $self->{'taxon_id'} = $type ;  
+   } 
+  return $self->{'taxon_id'};
+}
+
+
+sub kill_list_dbadaptor {
+  my $self = shift;
+  $self->{'kill_list_dbadaptor'} = shift if( @_ );
+  return $self->{'kill_list_dbadaptor'};
+}
+
+
 
 sub accession {
   my $self = shift;
@@ -526,6 +604,4 @@ sub _identical {
   }
   return $identical;
 }
-
 1;
-
