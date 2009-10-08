@@ -43,10 +43,10 @@ sub new {
     $self->{'_external_db_id_array'} = [];
   }
 
-  if(defined $user && (!ref($user) || !$user->isa('Bio::EnsEMBL::KillList::User'))) {
-    throw('-USER argument must be a Bio::EnsEMBL::User not '.
-          $user);
-  }
+  #if(defined $user && (!ref($user) || !$user->isa('Bio::EnsEMBL::KillList::User'))) {
+  #  throw('-USER argument must be a Bio::EnsEMBL::User not '.
+  #        $user);
+  #}
   $self->user( $user ) if ( defined $user );
 
   if(defined $from_source_species && (!ref($from_source_species) || !$from_source_species->isa('Bio::EnsEMBL::KillList::Species'))) {
