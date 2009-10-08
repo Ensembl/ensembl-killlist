@@ -4,7 +4,6 @@ use strict;
 use Bio::EnsEMBL::Storable;
 use Data::Dumper;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
-use Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;
 use Bio::EnsEMBL::KillList::AnalysisLite;
 use Bio::EnsEMBL::KillList::Reason;
 use Bio::EnsEMBL::KillList::Species;
@@ -175,7 +174,7 @@ sub fetch_KillObjects_by_Filter {
   print STDERR "(3) Removed from original (species)  : $num_deleted_species\n";
   print STDERR "(4) Kept from original (reason)      : $num_kept_reason\n";
   print STDERR "(5) Now fetching ".scalar(@list_to_fetch)." objects\n";
-  my $kill_objects = $self->fetch_all_by_dbID_list(\@list_to_fetch);
+  my $kill_objects = $self->fetch_all_by_dbID_list(\@list_to_fetch); 
   return $kill_objects;
 }
 
@@ -222,7 +221,8 @@ sub fetch_all_KillObjects {
 
 sub fetch_all_KillObjectIDs {
   my $self = shift;
-  my %kill_object_ids;
+  my %kill_object_ids; 
+  print "testing\n" ; 
   my $sth = $self->prepare(
             "SELECT ko.kill_object_id ". 
             "FROM kill_object ko, kill_object_status kos ".
@@ -987,7 +987,6 @@ sub was_removed {
 sub _objs_from_sth {
   my ($self, $sth) = @_;
   
-  my $ua = $self->db->get_UserAdaptor();
   my $sa = $self->db->get_SpeciesAdaptor();
 
   my @out;
@@ -1001,20 +1000,22 @@ sub _objs_from_sth {
        \$description, \$user_id, 
         );
 
-  while($sth->fetch()) {
-#    print STDERR "$kill_object_id, $taxon_id, $mol_type, $accession, $version, $external_db_id, $description, $user_id\n";
-    my $user = $ua->fetch_by_dbID($user_id);
-    my $taxon = $sa->fetch_by_dbID($taxon_id);
+  while($sth->fetch()) { 
+
+   # print STDERR "$kill_object_id, $taxon_id, $mol_type, $accession, $version, $external_db_id, $description, $user_id\n";  
+
+
     push @out, Bio::EnsEMBL::KillList::KillObject->new(
               -dbID           => $kill_object_id,
               -adaptor        => $self,
-              -taxon          => $taxon,
+              -taxon_id       => $taxon_id, 
               -mol_type       => $mol_type,
               -accession      => $accession,
               -version        => $version,
               -external_db_id => $external_db_id,
               -description    => $description,
-              -user           => $user,
+              -user_id        => $user_id, 
+              -kill_list_dbadaptor => $self->db, 
               );
   }
   return \@out;
