@@ -94,7 +94,7 @@ my $mole_dbport = 3306;
         'mole_dbnames=s'           => \@mole_dbnames,
         'file=s'                   => \$file,
         'accession=s'              => \$accession,
-        'killer=s'                 => \$user_name,
+        'killer|user=s'                 => \$user_name,
         'source_taxon=s'           => \$source_taxon,
         'reasons=s'                => \@reasons,
         'for_genebuild_species=s'  => \@for_genebuild_species,
@@ -120,8 +120,12 @@ if (!@reasons) {
   die "ERROR: Please set at least one reason for this entry\n";
 }
 
-if (!@mole_dbnames) {
-  die "Please enter a list of -mole_dbnames\n";
+if (!@mole_dbnames) { 
+  
+  throw "Please enter a list of -mole_dbnames\n". 
+      "You get the latest list with : \n\tmysql -ugenero -hcbi3 -Dmm_ini -e".
+      " \"select database_name from ini where available=\'yes\' and current = \'yes\'\"" ; 
+  
 
 }
 
@@ -228,8 +232,10 @@ foreach my $accession_version (@accessions) {
   if (!defined $accession_to_store) {
     throw("No accession_to_store for $accession_version");
   }
-  my $mol_type = $mole_entry->molecule_type;
-  my $source_taxon_id = $mole_entry->taxonomy_obj->ncbi_tax_id;
+  my $mol_type = $mole_entry->molecule_type;  
+
+  my $source_taxon_id = $mole_entry->taxonomy_obj->ncbi_tax_id; 
+
   my $version = $mole_entry->accession_version;
   if (!defined $version) {
     warning("No version for $accession_version");
@@ -281,7 +287,7 @@ foreach my $accession_version (@accessions) {
   } else {
     throw("Source_taxon_id not defined");
   }
-  
+ 
   # check we have a description
   if (!defined $description) {
     warning("No description entered");
@@ -331,7 +337,6 @@ foreach my $accession_version (@accessions) {
 #                         -message => $message);
 #    push @comment_objs, $comment_obj;
 #  }
-
   my $new_evidence = Bio::EnsEMBL::KillList::KillObject->new(
                                            -taxon            => $source_taxon,
                                            -user             => $user,
