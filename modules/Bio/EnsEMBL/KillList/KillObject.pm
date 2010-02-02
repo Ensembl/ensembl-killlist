@@ -41,7 +41,6 @@ sub new {
                   "COMMENTS","KILL_LIST_DBADAPTOR","USER_ID","TAXON_ID"], @_ );
 
 
-
  if (!defined($mol_type)) {throw " ERROR: need to set -mol_type\n";}
  if (!defined($external_db_id)) {throw " ERROR: need to set -external_db_id\n";}
  #if (!defined($taxon)) {throw " ERROR: need to set -taxon\n";}  
@@ -76,7 +75,7 @@ sub new {
   if ( $taxonObj ) { 
      if(!ref($taxonObj) || !$taxonObj->isa('Bio::EnsEMBL::KillList::Species')) {
        throw('-TAXON argument must be a Bio::EnsEMBL::Species not '.  $taxonObj);
-     } else { 
+     } else {  
        $self->taxon($taxonObj); 
      }  
   }
@@ -150,11 +149,13 @@ sub user {
 sub taxon {
   my (  $self, $spp ) = @_ ;  
 
-  if(defined($spp) && (!ref($spp) || !$spp->isa('Bio::EnsEMBL::KillList::Species'))) {
-     throw('taxon argument must be a Bio::EnsEMBL::Species');
-  } else { 
-     $self->{'taxon'} = $spp;
-  } 
+  if(defined($spp) ) { 
+     if (!ref($spp) || !$spp->isa('Bio::EnsEMBL::KillList::Species')) {
+       throw('taxon argument must be a Bio::EnsEMBL::Species');
+     } else { 
+       $self->{'taxon'} = $spp;
+    }  
+  }
 
   # no taxon object but taxon_id  
   unless ( $self->{taxon} ) {  
