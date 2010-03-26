@@ -76,8 +76,9 @@ my (
 # kill_list database
 $dbname = 'ba1_ensembl_kill_list';
 $dbhost = 'genebuild6';
-$dbuser = 'ensro';
+$dbuser = 'ensadmin';
 $dbport = 3306, 
+$dbpass = undef;
 
 # Mole database
 my $mole_dbhost = 'cbi3';
@@ -103,10 +104,15 @@ my $mole_dbport = 3306;
 
 
 # check db variables
-if ( !defined($dbname) || !defined($dbuser) || !defined($dbhost) || 
-     !defined($dbport) || !defined($dbpass)) {
+if ( !defined($dbname) || !defined($dbuser) || !defined($dbhost) || !defined($dbport)){ 
   die "ERROR: Please set dbhost (-hdbost), dbname (-dbname), dbport (-dbport), dbpass (-dbpass) and dbuser (-dbuser)\n";
 }
+if ( !defined($dbpass)){ 
+  die "ERROR: Please set -dbpass <XXXXX> \n"; 
+}
+
+print "You're writing to kill list database : $dbname \@ $dbhost \n" ; sleep(3);
+
 
 if ( !defined($file) && !defined $accession ) {
   die "Please enter accession or file name, with each line containing accession_version acession molecule_type sequence description\n";
@@ -215,16 +221,18 @@ foreach my $accession_version (@accessions) {
       last if defined $mole_entry;
     }
   } else {
-    #accession has no version
+    #accession has no version 
+    print "ACCESSION has no version \n" ;  
+    # get by accession 
     foreach my $db (@mole_dbs) {
-      my $ea = $db->get_EntryAdaptor();
-      $mole_entry = $ea->fetch_by_name($accession_version);
+      my $acc_obj = $db->get_AccessionAdaptor->fetch_by_accession($accession_version) ;  
+      $mole_entry = $db->get_EntryAdaptor->fetch_by_dbID($acc_obj->entry_id) ; 
       $from_database = $db->dbc->dbname();
       last if defined $mole_entry;
-    }
+    } 
   }
   if (!defined $mole_entry) {
-    throw("Unable to fetch entry from mole");
+    throw("Unable to fetch entry : $accession_version from mole");
   }
 
   # Get additional info
@@ -411,7 +419,6 @@ sub get_check_user {
     foreach my $user (@$existing_users) {
       if ($username eq $user->user_name ) {
         $user_ok = 1;
-        print STDERR -"user_name found\n";  
         last;
       }
     }
