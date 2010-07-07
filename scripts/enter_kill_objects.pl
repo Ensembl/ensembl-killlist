@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+# Notes found at ensembl-doc/pipeline_docs/using_kill_list_database.txt
+
 # This script allows a user to enter a killer,file or accession, and reason
 # (along with the dbuser and dbpass). As long as all info required
 # can be found in the Mole db, the entry is stored in the 
@@ -46,6 +48,8 @@ use Bio::EnsEMBL::Utils::Exception qw(throw deprecate warning);
 
 # check these are the latest versions:
 my @mole_dbnames; # = ('refseq_26','uniprot_12_6','embl_92','embl_89','refseq_25','uniprot_12_5','uniprot_9_3'); 
+# you just need the refseq, embl, emnew and uniprot databases
+# the order they are entered in here will determin the order they are searched
 
 #No custom modification should be needed below this line
 #===============================
@@ -169,7 +173,7 @@ foreach my $mole_dbname (@mole_dbnames) {
   );
   push @mole_dbs, $db;
 }
-
+print "\nConnected to Mole databases. Now searching for accessions in Mole...\n";
 
 # get Kill list adaptors
 my $analysis_adaptor = $db->get_AnalysisLiteAdaptor();
@@ -226,7 +230,9 @@ foreach my $accession_version (@accessions) {
     # get by accession 
     foreach my $db (@mole_dbs) {
       my $acc_obj = $db->get_AccessionAdaptor->fetch_by_accession($accession_version) ;  
-      $mole_entry = $db->get_EntryAdaptor->fetch_by_dbID($acc_obj->entry_id) ; 
+      if (defined $acc_obj) {
+        $mole_entry = $db->get_EntryAdaptor->fetch_by_dbID($acc_obj->entry_id) ; 
+      }
       $from_database = $db->dbc->dbname();
       last if defined $mole_entry;
     } 
