@@ -235,7 +235,7 @@ sub get_kill_list {
   print "\nUsing kill-list-db : " . $DATABASES->{KILL_LIST_DB}->{"-dbname"} . " \@ " . $DATABASES->{KILL_LIST_DB}->{"-host"} . "\n";
 
   my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $DATABASES->{KILL_LIST_DB} }) ;
-  $db->disconnect_when_inactive(1); 
+  $db->dbc->disconnect_when_inactive(1); 
   #get the kill_list filter
   my %filter_params = %{$self->FILTER_PARAMS};
 #  foreach my $key (keys %filter_params) {
