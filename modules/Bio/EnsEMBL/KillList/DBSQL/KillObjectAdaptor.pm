@@ -1018,6 +1018,9 @@ sub _objs_from_sth {
               -kill_list_dbadaptor => $self->db, 
               );
   }
+  foreach my $o (@out) {
+    $o->timestamp($self->get_timestamp($o));
+  }
   return \@out;
 }
 
