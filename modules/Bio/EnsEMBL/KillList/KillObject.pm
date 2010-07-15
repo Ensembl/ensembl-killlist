@@ -100,19 +100,19 @@ sub new {
   if ($analyses) {
     $self->{'_analysis_array'} = $analyses;
   } else {
-    $self->{'_analysis_array'} = [];
+    $self->{'_analysis_array'} = $self->get_all_Analyses_allowed();
   }
 
   if ($species_allowed) {
     $self->{'_species_allowed_array'} = $species_allowed;
   } else {
-    $self->{'_species_allowed_array'} = [];
+    $self->{'_species_allowed_array'} = $self->get_all_Species_allowed();
   }
  
   if ($comments) {
     $self->{'_comment_array'} = $comments;
   } else {
-    $self->{'_comment_array'} = [];
+    $self->{'_comment_array'} = $self->get_all_Comments();;
   } 
   $self->dbID( $object_id ) if ( defined $object_id );
 
