@@ -89,6 +89,8 @@ my $mole_dbhost = 'cbi3';
 my $mole_dbuser = 'genero';
 my $mole_dbport = 3306;
 
+my @not_stored;
+my @stored;
 
 &GetOptions(
         'dbname=s'                 => \$dbname,
@@ -210,7 +212,7 @@ if (defined $file) {
 }
 
 
-foreach my $accession_version (@accessions) {
+ACC: foreach my $accession_version (@accessions) {
   # # # 
   # Fetch the Entry from Mole db
   # # #
@@ -238,7 +240,9 @@ foreach my $accession_version (@accessions) {
     } 
   }
   if (!defined $mole_entry) {
-    throw("Unable to fetch entry : $accession_version from mole");
+    push @not_stored, $accession_version;
+    warning("Unable to fetch entry : $accession_version from mole");
+    next ACC;
   }
 
   # Get additional info
@@ -269,17 +273,37 @@ foreach my $accession_version (@accessions) {
     throw("-mol_type not defined");
   } elsif ($mol_type =~ m/protein/i) {
     $mol_type = 'protein';
-  } elsif ($mol_type =~ m/cdna/i) {
+  } elsif ($mol_type =~ m/cDNA/) {
     $mol_type = 'cDNA';
   } elsif ($mol_type =~ m/mrna/i) {
     $mol_type = 'cDNA';
-  } elsif ($mol_type =~ m/rna/i) {
-    $mol_type = 'cDNA';
   } elsif ($mol_type =~ m/est/i) {
     $mol_type = 'EST';
+  } elsif ($mol_type =~ /genomic DNA/ || 
+           $mol_type =~ /unassigned DNA/ ||
+           $mol_type =~ /DNA/ ||
+           $mol_type =~ /ss-DNA/ ||
+           $mol_type =~ /RNA/ ||
+           $mol_type =~ /genomic RNA/ ||
+           $mol_type =~ /ds-RNA/ ||
+           $mol_type =~ /ss-cRNA/ ||
+           $mol_type =~ /ss-RNA/ ||
+           $mol_type =~ /tRNA/ ||
+           $mol_type =~ /rRNA/ ||
+           $mol_type =~ /snoRNA/ ||
+           $mol_type =~ /snRNA/ ||
+           $mol_type =~ /scRNA/ ||
+           $mol_type =~ /pre-RNA/ ||
+           $mol_type =~ /other RNA/ ||
+           $mol_type =~ /other DNA/ ||
+           $mol_type =~ /unassigned RNA/ ||
+           $mol_type =~ /viral cRNA/ ||
+           $mol_type =~ /cRNA/ ) {
+    warning("-mol_type *$mol_type* entered is unusual. Usually we see 'protein', 'cDNA' or 'mRNA' or EST for $accession_version");
   } else {
-    throw("-mol_type entered is not valid. Must be 'protein', 'cDNA' or 'mRNA'");
+    throw("-mol_type *$mol_type* entered is not valid for $accession_version");
   }
+
 
  # check we have external_db
   my $external_db_id;
@@ -375,8 +399,6 @@ foreach my $accession_version (@accessions) {
 }
 
 
-my @stored;
-my @not_stored;
 print STDERR "Have ".scalar(@evidence_to_store)." new kill_list objects to store\n";
 foreach my $new_evidence (@evidence_to_store) {
   my $evidence_dbID;
