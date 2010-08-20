@@ -37,6 +37,7 @@ use Bio::EnsEMBL::ExternalData::Mole::Accession;
 use Bio::EnsEMBL::ExternalData::Mole::DBXref;
 use Bio::EnsEMBL::ExternalData::Mole::Description;
 use Bio::EnsEMBL::ExternalData::Mole::Entry;
+use Bio::EnsEMBL::ExternalData::Mole::EntryArchive;
 use Bio::EnsEMBL::ExternalData::Mole::Taxonomy;
 use Bio::EnsEMBL::ExternalData::Mole::DBSQL::DBAdaptor;
 
@@ -213,6 +214,7 @@ if (defined $file) {
 
 
 ACC: foreach my $accession_version (@accessions) {
+print STDERR "DOING $accession_version\n";
   # # # 
   # Fetch the Entry from Mole db
   # # #
@@ -221,7 +223,12 @@ ACC: foreach my $accession_version (@accessions) {
   if ($accession_version =~ m/\.\d/) {
     #accession has a version
     foreach my $db (@mole_dbs) {
-      my $ea = $db->get_EntryAdaptor();
+      my $ea;
+      if ($db->dbc->dbname() eq 'uniprot_archive') {
+        $ea = $db->get_EntryArchiveAdaptor();
+      } else {
+        $ea = $db->get_EntryAdaptor();
+      }
       $mole_entry = $ea->fetch_by_accession_version($accession_version);
       $from_database = $db->dbc->dbname();
       last if defined $mole_entry;
@@ -230,15 +237,37 @@ ACC: foreach my $accession_version (@accessions) {
     #accession has no version 
     print "ACCESSION has no version \n" ;  
     # get by accession 
-    foreach my $db (@mole_dbs) {
+    MOLE: foreach my $db (@mole_dbs) {
+      # we can't do this call for archive as it hase a different schema
+      # with no accession table 
+      next MOLE if ($db->dbc->dbname eq 'uniprot_archive');
+
       my $acc_obj = $db->get_AccessionAdaptor->fetch_by_accession($accession_version) ;  
       if (defined $acc_obj) {
         $mole_entry = $db->get_EntryAdaptor->fetch_by_dbID($acc_obj->entry_id) ; 
       }
       $from_database = $db->dbc->dbname();
-      last if defined $mole_entry;
+      last MOLE if defined $mole_entry;
     } 
-  }
+
+#    if (!defined $mole_entry) {
+#      INCREMENT_VERS: for (my $i=1; $i<5; $i++) {
+#        foreach my $db (@mole_dbs) {
+#          my $ea;
+#          if ($db->dbc->dbname() eq 'uniprot_archive') {
+#            $ea = $db->get_EntryArchiveAdaptor();
+#          } else {
+#            $ea = $db->get_EntryAdaptor();
+#          }
+#          $mole_entry = $ea->fetch_by_accession_version($accession_version.".$i");
+#          $from_database = $db->dbc->dbname();
+#          last INCREMENT_VERS if defined $mole_entry;
+#  
+#        }
+#      }
+#    }
+
+  } # accession has no version  
   if (!defined $mole_entry) {
     push @not_stored, $accession_version;
     warning("Unable to fetch entry : $accession_version from mole");
@@ -246,24 +275,46 @@ ACC: foreach my $accession_version (@accessions) {
   }
 
   # Get additional info
-  my $accession_to_store = $mole_entry->accession_obj->accession;
+
+  # accession
+  my $accession_to_store; 
+  if ($from_database eq 'uniprot_archive') {
+    $accession_to_store = $mole_entry->name;
+  } else {
+    $accession_to_store = $mole_entry->accession_obj->accession;
+  }
   if (!defined $accession_to_store) {
     throw("No accession_to_store for $accession_version");
   }
+
+  # molecule type
   my $mol_type = $mole_entry->molecule_type;  
 
-  my $source_taxon_id = $mole_entry->taxonomy_obj->ncbi_tax_id; 
+  # taxonomy 
+  my $source_taxon_id; 
+  if ($mole_entry->taxonomy_obj) {
+    $source_taxon_id = $mole_entry->taxonomy_obj->ncbi_tax_id; 
+  } elsif ($mole_entry->name =~ /HUMAN/) {
+    $source_taxon_id = 9606;
+  } elsif ($mole_entry->name =~ /MOUSE/) {
+    $source_taxon_id = 10090;
+  }
 
+  # accession version
   my $version = $mole_entry->accession_version;
   if (!defined $version) {
     warning("No version for $accession_version");
   }
+ 
+  # description
   my $description;
   if (defined $mole_entry->description_obj && defined $mole_entry->description_obj->description) {
     $description = $mole_entry->description_obj->description;
   } else {
     $description = 'No description available';
   }
+
+  # sequence
   my $sequence = $mole_entry->sequence_obj->sequence;
   my $sequence_obj = Bio::EnsEMBL::KillList::Sequence->new(
               -sequence => $sequence);
