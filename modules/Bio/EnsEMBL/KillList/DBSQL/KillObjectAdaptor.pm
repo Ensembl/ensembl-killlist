@@ -919,6 +919,10 @@ sub remove {
   # unset the obj identifier and adaptor thereby flagging it as unstored
   $obj->dbID(undef);
   $obj->adaptor(undef);
+ 
+  # when removingkill-objects their sequences are not re-stored
+  #$obj->sequence->dbID(undef);
+  #$obj->sequence->adaptor(undef);
 
   # now store the object with a 'removed' status
   my $new_dbid = $self->store($obj, "REMOVED");
