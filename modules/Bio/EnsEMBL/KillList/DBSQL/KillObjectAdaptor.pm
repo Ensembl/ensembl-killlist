@@ -770,10 +770,14 @@ sub store {
   } else {
     #store new
     $obj_to_store = $obj;
-    $status = "CREATED";
+    # we may have passed in a status 
+    # if so, we don't want to over-write it
+    if (!defined $status) {
+      $status = "CREATED";
+    }
   } 
   print STDOUT "THIS IS THE UNION\n" if ($stored_dbID);
-  print STDOUT Dumper($obj_to_store);
+  #print STDOUT Dumper($obj_to_store);
 
 
   # these four should already be set
@@ -784,7 +788,7 @@ sub store {
   my $accession = $obj_to_store->accession;
   throw("Object to be stored needs an accession.") if (!defined($accession));
   my $reasons = $obj_to_store->get_all_Reasons();
-  throw("Object to be stored needs at least one reason.") if (!defined($reasons));
+  throw("Object to be stored needs at least one reason.") if (!(@{$reasons}));
  
   # these ones may not be set. If not set, give them defaults
   my $taxon_id        = $obj_to_store->taxon->taxon_id;
