@@ -26,7 +26,9 @@ CREATE TABLE kill_object (
   PRIMARY KEY (kill_object_id),
   KEY species (taxon_id),
   KEY external_db (external_db_id),
-  KEY user (user_id) 
+  KEY user (user_id), 
+  KEY moltype_idx (mol_type),
+  KEY accession_idx (accession)
 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
 
@@ -94,9 +96,10 @@ CREATE TABLE reason (
 
   reason_id               INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   reason_description      VARCHAR(50), 
-  why                     TEXT,
+  why                     VARCHAR(25) NOT NULL,
 
-  PRIMARY KEY (reason_id)
+  PRIMARY KEY (reason_id),
+  KEY why_idx (why)
 
 ) COLLATE=latin1_swedish_ci TYPE=MyISAM;
 
