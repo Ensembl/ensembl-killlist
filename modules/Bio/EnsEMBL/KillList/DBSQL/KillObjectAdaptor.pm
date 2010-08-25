@@ -992,6 +992,39 @@ sub was_removed {
   return $was_removed;
 }
 
+=head2 is_killed
+
+  Check whether an accession is killed in the db
+
+=cut
+
+sub is_killed {
+  my ($self, $accession) = @_ ;
+  my $entry;
+  $accession =~ s/\.\d+//;
+
+  # Look in the db
+  my $sth = $self->prepare(
+            "SELECT ko.kill_object_id  ".
+            "FROM kill_object ko, kill_object_status kos ".
+            "WHERE ko.kill_object_id = kos.kill_object_id ".
+            "AND  kos.is_current = 1 ".
+            "AND  kos.status != 'REMOVED' ".
+            "AND ko.accession = ?");
+  $sth->bind_param(1, $accession, SQL_VARCHAR);
+  $sth->execute();
+  my ($id) = $sth->fetchrow();
+  $sth->finish();
+
+  # Check if found
+  if (defined($id) ) {
+    $entry =  $self->fetch_by_dbID($id, 1);
+  }
+
+  return $entry;
+}
+
+
 sub _objs_from_sth {
   my ($self, $sth) = @_;
   
