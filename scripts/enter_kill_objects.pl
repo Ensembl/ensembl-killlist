@@ -1,25 +1,61 @@
-#!/usr/bin/perl -w
+#!/usr/local/ensembl/bin/perl
 
-# Notes found at ensembl-doc/pipeline_docs/using_kill_list_database.txt
+=pod
 
-# This script allows a user to enter a killer,file or accession, and reason
-# (along with the dbuser and dbpass). As long as all info required
-# can be found in the Mole db, the entry is stored in the 
-# ensembl_kill_list database. 
+=head1 DESCRIPTION
 
-# To find the latest Mole dbanmes, do:
-# mysql -ugenero -hcbi3 -Dmm_ini -e "select database_name from ini where available='yes' and current = 'yes'"
+  Notes found at ensembl-doc/pipeline_docs/using_kill_list_database.txt
 
-# Tag the following optional parameters on to the commandline too:
-# -for_genebuild_species, -for_genebuild_analyses, -comment
- 
-# The command will look something like this:
-#  perl enter_kill_objects.pl -killer myname -file info.ls \
-#  -dbuser ensadmin -dbpass xxx -reasons Repetitive,Short -for_genebuild_species \
-#  10090,9606 -for_genebuild_analyses xlaevis_cDNA,Vertrna -comment 'this is bad'
+  This script allows a user to enter a killer,file or accession, and
+  reason (along with the dbuser and dbpass). As long as all info
+  required can be found in the Mole db, the entry is stored in the
+  ensembl_kill_list database.
 
+=head2 Mole database names
+
+  To find the latest Mole dbanmes, do:
+
+  mysql -ugenero -hcbi3 -Dmm_ini -e "select database_name from ini where available='yes' and current = 'yes'"
+
+=head1 OPTIONS
+
+  -dbuser                   User name to access the kill-list database
+
+  -dbpass                   Password for the kill-list database
+
+  -killer                   User name of the 'killer'
+
+  -mole_dbnames             List of existing databases in Mole
+
+  -reasons                  Reason for killing a sequence
+
+  -accession                Accession number of a single sequence to be killed
+
+  -file                     Input file with accession numbers
+
+  [-source_taxon]           Taxonomy name of the species
+
+  [-for_genebuild_species]  List of Taxonomy IDs of species where a sequence has caused problems
+
+  [-for_genebuild_analyses] List of analyses the sequence was used in
+
+=head1 EXAMPLES
+
+  Tag the following optional parameters on to the commandline too:
+
+    -for_genebuild_species, -for_genebuild_analyses
+
+  The command will look something like this:
+
+    perl enter_kill_objects.pl -killer myname -file info.ls  \
+      -dbuser ensadmin -dbpass xxx -reasons Repetitive,Short \
+      -for_genebuild_species 10090,9606 -for_genebuild_analyses xlaevis_cDNA,Vertrna \
+
+=cut
 
 use strict;
+use warnings;
+
 use Getopt::Long;
 use Data::Dumper;
 
@@ -45,10 +81,10 @@ use Bio::EnsEMBL::Utils::Exception qw(throw deprecate warning);
 
 
 #===============================
-#Modify things before running: 
+#Modify things before running:
 
 # check these are the latest versions:
-my @mole_dbnames; # = ('refseq_26','uniprot_12_6','embl_92','embl_89','refseq_25','uniprot_12_5','uniprot_9_3'); 
+my @mole_dbnames; # = ('refseq_26','uniprot_12_6','embl_92','embl_89','refseq_25','uniprot_12_5','uniprot_9_3');
 # you just need the refseq, embl, emnew and uniprot databases
 # the order they are entered in here will determin the order they are searched
 
@@ -93,21 +129,19 @@ my $mole_dbport = 3306;
 my @not_stored;
 my @stored;
 
-&GetOptions(
-        'dbname=s'                 => \$dbname,
-        'dbuser=s'                 => \$dbuser,
-        'dbhost=s'                 => \$dbhost,
-        'dbport=s'                 => \$dbport,
-        'dbpass=s'                 => \$dbpass,
-        'mole_dbnames=s'           => \@mole_dbnames,
-        'file=s'                   => \$file,
-        'accession=s'              => \$accession,
-        'killer|user=s'                 => \$user_name,
-        'source_taxon=s'           => \$source_taxon,
-        'reasons=s'                => \@reasons,
-        'for_genebuild_species=s'  => \@for_genebuild_species,
-        'for_genebuild_analyses=s' => \@for_genebuild_analyses,
-);
+GetOptions( 'dbname=s'                 => \$dbname,
+            'dbuser=s'                 => \$dbuser,
+            'dbhost=s'                 => \$dbhost,
+            'dbport=s'                 => \$dbport,
+            'dbpass=s'                 => \$dbpass,
+            'mole_dbnames=s'           => \@mole_dbnames,
+            'file=s'                   => \$file,
+            'accession=s'              => \$accession,
+            'killer|user=s'            => \$user_name,
+            'source_taxon=s'           => \$source_taxon,
+            'reasons=s'                => \@reasons,
+            'for_genebuild_species=s'  => \@for_genebuild_species,
+            'for_genebuild_analyses=s' => \@for_genebuild_analyses, );
 
 
 # check db variables
