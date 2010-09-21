@@ -33,6 +33,8 @@
 
   -file                     Input file with accession numbers
 
+  [-comments]               Quoated free text to accompany an entry
+
   [-source_taxon]           Taxonomy name of the species
 
   [-for_genebuild_species]  List of Taxonomy IDs of species where a sequence has caused problems
@@ -49,7 +51,7 @@
 
     perl enter_kill_objects.pl -killer myname -file info.ls  \
       -dbuser ensadmin -dbpass xxx -reasons Repetitive,Short \
-      -for_genebuild_species 10090,9606 -for_genebuild_analyses xlaevis_cDNA,Vertrna \
+      -for_genebuild_species 10090,9606 -for_genebuild_analyses xlaevis_cDNA,Vertrna
 
 =cut
 
@@ -110,6 +112,7 @@ my (
         $user_name,
         $source_taxon,
         @reasons,
+        @comments,
         @for_genebuild_species,
         @for_genebuild_analyses,
         );
@@ -140,6 +143,7 @@ GetOptions( 'dbname=s'                 => \$dbname,
             'killer|user=s'            => \$user_name,
             'source_taxon=s'           => \$source_taxon,
             'reasons=s'                => \@reasons,
+            'comments=s'               => \@comments,
             'for_genebuild_species=s'  => \@for_genebuild_species,
             'for_genebuild_analyses=s' => \@for_genebuild_analyses, );
 
@@ -447,19 +451,20 @@ print STDERR "DOING $accession_version\n";
       push @analyses_allowed_objs, $analysis_adaptor->fetch_by_logic_name($logic);
     }
   }
-  
-#  # make comment
-#  my $message;
-#  my @comment_objs; 
-#  if (!scalar(@comment)) {
-#    $message = "No comment added"; 
-#  } else {
-#    $message = join(' ', @comment); 
-#    my $comment_obj = Bio::EnsEMBL::KillList::Comment->new(
-#                         -user    => $user,
-#                         -message => $message);
-#    push @comment_objs, $comment_obj;
-#  }
+
+  # Add a comment to the entry
+  my $message;
+  my @comment_objs; 
+  if (scalar(@comments)) {
+    $message = join(' ', @comments);
+    my $comment_obj = Bio::EnsEMBL::KillList::Comment->new(
+                         -user    => $user,
+                         -message => $message);
+    push @comment_objs, $comment_obj;
+  } else {
+    #$message = "No comment added";
+  }
+
   my $new_evidence = Bio::EnsEMBL::KillList::KillObject->new(
                                            -taxon            => $source_taxon,
                                            -user             => $user,
@@ -470,7 +475,7 @@ print STDERR "DOING $accession_version\n";
                                            -description      => $description,
                                            -reasons          => \@reasons_objs,
                                            -analyses         => \@analyses_allowed_objs,
-#                                           -comments         => \@comment_objs,
+                                           -comments         => \@comment_objs,
                                            -species_allowed  => \@species_allowed_objs,
                                           );
   if (defined $sequence_obj) {
