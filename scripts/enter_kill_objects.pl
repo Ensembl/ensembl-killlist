@@ -192,6 +192,11 @@ if (scalar(@for_genebuild_analyses)) {
 }
 if (scalar(@mole_dbnames)) {
   @mole_dbnames = split(/,/,join(',',@mole_dbnames));
+  foreach my $mdb (@mole_dbnames) {
+    if ($mdb =~ /mushroom/i) {
+      throw("Only enter RefSeq, UniProt and EMBL database names from Mole");
+    }
+  }
 }
 
 # connect to kill_list db
