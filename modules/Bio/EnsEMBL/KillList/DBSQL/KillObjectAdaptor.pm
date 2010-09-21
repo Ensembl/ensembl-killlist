@@ -747,9 +747,9 @@ sub store {
     } elsif (defined $force && $current->current_status ne 'REMOVED') {
       #store union
       print STDOUT "THIS IS THE CURRENT OBJECT\n";
-      print STDOUT Dumper($current); 
+      #print STDOUT Dumper($current); 
       print STDOUT "THIS IS THE NEW OBJECT\n";
-      print STDOUT Dumper($obj);
+      #print STDOUT Dumper($obj);
       $obj_to_store = get_union($current,$obj);
     } elsif (defined $force && $current->current_status eq 'REMOVED') {
       $status = "REINSTATED";
