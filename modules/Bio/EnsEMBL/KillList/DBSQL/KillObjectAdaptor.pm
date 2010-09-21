@@ -416,6 +416,9 @@ sub fetch_by_accession {
   # there should only be one is_current
   my $id = $sth->fetchrow();
   $sth->finish();
+  
+  return undef if (!$id);
+
   if (defined $do_full_fetch) {
     $killobj = $self->fetch_by_dbID($id, 1);
   } else {
