@@ -615,7 +615,7 @@ sub print_stored {
   }
   print STDERR "  Analyses_allowed ->\n ";
   foreach my $analysis (@{$db->get_AnalysisLiteAdaptor->fetch_all_by_KillObject($kill_adaptor->fetch_by_dbID($evidence_dbID))}) {
-    print STDERR "                   : ".$analysis->program."\n";
+    print STDERR "                   : ".$analysis->logic_name."\n";
   }
   print STDERR " Reasons          ->\n";
   foreach my $reason (@{$db->get_ReasonAdaptor->fetch_all_by_KillObject($kill_adaptor->fetch_by_dbID($evidence_dbID))}) {
