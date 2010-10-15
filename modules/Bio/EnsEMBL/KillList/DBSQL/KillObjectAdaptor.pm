@@ -775,7 +775,7 @@ sub store {
     $obj_to_store = $obj;
     # we may have passed in a status 
     # if so, we don't want to over-write it
-    if (!defined $status) {
+    if (!defined $status || $status == 0) {
       $status = "CREATED";
     }
   } 
