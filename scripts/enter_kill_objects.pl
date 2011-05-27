@@ -15,7 +15,7 @@
 
   To find the latest Mole dbanmes, do:
 
-  mysql -ugenero -hcbi3 -Dmm_ini -e "select database_name from ini where available='yes' and current = 'yes'"
+  mysql -ugenero -hcbi5d -Dmm_ini -e "select database_name from ini where available='yes' and current = 'yes'"
 
 =head1 OPTIONS
 
@@ -125,7 +125,7 @@ $dbport = 3306,
 $dbpass = undef;
 
 # Mole database
-my $mole_dbhost = 'cbi3';
+my $mole_dbhost = 'cbi5d';
 my $mole_dbuser = 'genero';
 my $mole_dbport = 3306;
 
