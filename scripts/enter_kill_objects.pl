@@ -174,7 +174,7 @@ if (!@reasons) {
 if (!@mole_dbnames) { 
   
   throw "Please enter a list of -mole_dbnames\n". 
-      "You get the latest list with : \n\tmysql -ugenero -hcbi3 -Dmm_ini -e".
+      "You get the latest list with : \n\tmysql -ugenero -hcbi5d -Dmm_ini -e".
       " \"select database_name from ini where available=\'yes\' and current = \'yes\'\"" ; 
   
 
