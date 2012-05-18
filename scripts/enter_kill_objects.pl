@@ -55,6 +55,11 @@
 
 =cut
 
+
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/scripts/enter_kill_objects.pl,v $
+# $Revision: 1.20 $ 
+
+
 use strict;
 use warnings;
 
@@ -156,8 +161,7 @@ if ( !defined($dbpass)){
   die "ERROR: Please set -dbpass <XXXXX> \n"; 
 }
 
-print "You're writing to kill list database : $dbname \@ $dbhost \n" ; sleep(3);
-
+print "You ($user_name) are writing to kill list database : $dbname \@ $dbhost \n" ; sleep(3);
 
 if ( !defined($file) && !defined $accession ) {
   die "Please enter accession or file name, with each line containing accession_version acession molecule_type sequence description\n";
@@ -413,12 +417,18 @@ print STDERR "DOING $accession_version\n";
     throw("External_db not not found");
   }
 
- # check we have source_taxon_id
+  # check we have source_taxon_id
   if (defined $source_taxon_id) {
     $source_taxon = get_check_source_taxon($species_adaptor, $source_taxon_id, 0);
   } else {
     throw("Source_taxon_id not defined");
   }
+
+  if( !defined $source_taxon ) {
+    throw( "Species not present in Database, source_taxon not defined for ID ".$source_taxon_id ) ;
+  }
+
+
  
   # check we have a description
   if (!defined $description) {
