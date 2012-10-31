@@ -55,7 +55,7 @@ sub new {
   $self->KILL_LIST_DB  ( $kill_list_db ) if ( defined $kill_list_db );
   $self->FILTER_PARAMS ( $filter_params ) if ( defined $filter_params );
 
-  $self->read_and_check_config($KILL_LIST_CONFIG);
+  $self->read_and_check_config($KILL_LIST_CONFIG_BY_LOGIC);
 
   return $self; # success - we hope!
 }
