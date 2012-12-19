@@ -37,10 +37,14 @@ Post questions the the EnsEMBL developer list: <ensembl-dev@ebi.ac.uk>
 # Let the code begin...
 
 
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/DBSQL/DBAdaptor.pm,v $
+# $Revision: 1.3 $
+
 package Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;
 
 use vars qw(@ISA);
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 

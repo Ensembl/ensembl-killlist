@@ -1,6 +1,10 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/DBSQL/AnalysisLiteAdaptor.pm,v $
+# $Revision: 1.2 $
+
 package Bio::EnsEMBL::KillList::DBSQL::AnalysisLiteAdaptor; 
 
 use strict;
+use warnings;
 use Bio::EnsEMBL::KillList::AnalysisLite;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
 use Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;

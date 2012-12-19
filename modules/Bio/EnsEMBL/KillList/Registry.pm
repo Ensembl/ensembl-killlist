@@ -97,9 +97,13 @@ Post questions to the Ensembl developer list: <ensembl-dev@ebi.ac.uk>
 =cut
 
 
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/Registry.pm,v $
+# $Revision: 1.3 $
+
 package Bio::EnsEMBL::KillList::Registry;
 
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 use Bio::EnsEMBL::Utils::Exception qw( deprecate throw warning );

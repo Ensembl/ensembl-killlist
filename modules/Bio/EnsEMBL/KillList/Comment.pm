@@ -1,7 +1,12 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/Comment.pm,v $
+# $Revision: 1.2 $
+
 package Bio::EnsEMBL::KillList::Comment;
 
 use vars qw(@ISA);
 use strict;
+use warnings;
+
 
 use Bio::EnsEMBL::Storable;
 

@@ -1,3 +1,6 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/KillObject.pm,v $
+# $Revision: 1.6 $
+
 package Bio::EnsEMBL::KillList::KillObject;
 
 =pod
@@ -16,6 +19,7 @@ package Bio::EnsEMBL::KillList::KillObject;
 
 
 use strict;
+use warnings;
 use Bio::EnsEMBL::Storable;
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);
 use Bio::EnsEMBL::Utils::Exception qw(throw deprecate warning);

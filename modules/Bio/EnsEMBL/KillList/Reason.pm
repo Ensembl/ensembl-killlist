@@ -1,7 +1,11 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/Reason.pm,v $
+# $Revision: 1.2 $
+
 package Bio::EnsEMBL::KillList::Reason;
 
 use vars qw(@ISA);
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::Storable;
 

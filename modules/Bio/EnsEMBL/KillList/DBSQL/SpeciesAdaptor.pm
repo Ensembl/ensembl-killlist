@@ -1,6 +1,10 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/DBSQL/SpeciesAdaptor.pm,v $
+# $Revision: 1.3 $
+
 package Bio::EnsEMBL::KillList::DBSQL::SpeciesAdaptor; 
 
 use strict;
+use warnings;
 use Bio::EnsEMBL::KillList::Species;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
 use Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;

@@ -1,6 +1,10 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/User.pm,v $
+# $Revision: 1.2 $
+
 package Bio::EnsEMBL::KillList::User;
 
 use strict;
+use warnings;
 use Bio::EnsEMBL::Storable;
 use Bio::EnsEMBL::KillList::DBSQL::UserAdaptor;
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);

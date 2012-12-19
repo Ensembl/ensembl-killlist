@@ -1,6 +1,10 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/DBSQL/ReasonAdaptor.pm,v $
+# $Revision: 1.2 $
+
 package Bio::EnsEMBL::KillList::DBSQL::ReasonAdaptor; 
 
 use strict;
+use warnings;
 use Bio::EnsEMBL::KillList::Reason;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
 use Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;

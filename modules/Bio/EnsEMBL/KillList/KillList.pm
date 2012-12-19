@@ -1,8 +1,10 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/KillList.pm,v $
+# $Revision: 1.8 $
+
 package Bio::EnsEMBL::KillList::KillList;
 
 use strict;
 use warnings;
-
 
 use Data::Dumper;
 

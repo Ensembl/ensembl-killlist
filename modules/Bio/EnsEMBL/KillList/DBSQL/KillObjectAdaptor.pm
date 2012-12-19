@@ -1,6 +1,10 @@
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/DBSQL/KillObjectAdaptor.pm,v $
+# $Revision: 1.13 $
+
 package Bio::EnsEMBL::KillList::DBSQL::KillObjectAdaptor; 
 
 use strict;
+use warnings;
 use Bio::EnsEMBL::Storable;
 use Data::Dumper;
 use Bio::EnsEMBL::DBSQL::BaseAdaptor;
