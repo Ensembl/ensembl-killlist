@@ -1,4 +1,7 @@
-#!/usr/local/ensembl/bin/perl -w
+#!/usr/bin/env perl
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/scripts/remove_killed_entries_from_fasta.pl,v $
+# $Revision: 1.2 $ 
+
 
 # # #
 # 
@@ -14,6 +17,8 @@
 # # #
 
 use strict;
+use warnings;
+
 use Bio::SeqIO;
 use Getopt::Long;
 use Bio::EnsEMBL::Utils::Exception qw(warning throw);

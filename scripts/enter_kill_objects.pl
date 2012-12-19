@@ -1,4 +1,7 @@
-#!/usr/local/ensembl/bin/perl
+#!/usr/bin/env perl
+# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/scripts/enter_kill_objects.pl,v $
+# $Revision: 1.21 $ 
+
 
 =pod
 
@@ -54,11 +57,6 @@
       -for_genebuild_species 10090,9606 -for_genebuild_analyses xlaevis_cDNA,Vertrna
 
 =cut
-
-
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/scripts/enter_kill_objects.pl,v $
-# $Revision: 1.20 $ 
-
 
 use strict;
 use warnings;
