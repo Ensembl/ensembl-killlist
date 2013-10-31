@@ -1,5 +1,3 @@
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/DBSQL/SequenceAdaptor.pm,v $
-# $Revision: 1.3 $
 
 package Bio::EnsEMBL::KillList::DBSQL::SequenceAdaptor; 
 

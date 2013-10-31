@@ -1,5 +1,3 @@
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/Team.pm,v $
-# $Revision: 1.2 $
 
 package Bio::EnsEMBL::KillList::Team;
 

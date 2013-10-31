@@ -1,5 +1,3 @@
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/KillObject.pm,v $
-# $Revision: 1.6 $
 
 package Bio::EnsEMBL::KillList::KillObject;
 

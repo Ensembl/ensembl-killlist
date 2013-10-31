@@ -1,5 +1,3 @@
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/Filter.pm,v $
-# $Revision: 1.4 $
 
 package Bio::EnsEMBL::KillList::Filter;
 

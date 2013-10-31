@@ -25,8 +25,6 @@ Post questions to the EnsEMBL::Map dev mailing list: <ensembl-dev@ebi.ac.uk>
 
 =cut
 
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/AnalysisLite.pm,v $
-# $Revision: 1.2 $
 
 package Bio::EnsEMBL::KillList::AnalysisLite;
 

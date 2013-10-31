@@ -37,8 +37,6 @@ Post questions the the EnsEMBL developer list: <ensembl-dev@ebi.ac.uk>
 # Let the code begin...
 
 
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/DBSQL/DBAdaptor.pm,v $
-# $Revision: 1.3 $
 
 package Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;
 

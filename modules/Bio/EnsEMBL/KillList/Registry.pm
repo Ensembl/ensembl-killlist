@@ -97,8 +97,6 @@ Post questions to the Ensembl developer list: <ensembl-dev@ebi.ac.uk>
 =cut
 
 
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/modules/Bio/EnsEMBL/KillList/Registry.pm,v $
-# $Revision: 1.3 $
 
 package Bio::EnsEMBL::KillList::Registry;
 
