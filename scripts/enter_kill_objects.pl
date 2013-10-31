@@ -1,6 +1,4 @@
 #!/usr/bin/env perl
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/scripts/enter_kill_objects.pl,v $
-# $Revision: 1.21 $ 
 
 
 =pod

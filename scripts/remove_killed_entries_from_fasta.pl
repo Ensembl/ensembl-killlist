@@ -1,6 +1,4 @@
 #!/usr/bin/env perl
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/scripts/remove_killed_entries_from_fasta.pl,v $
-# $Revision: 1.2 $ 
 
 
 # # #

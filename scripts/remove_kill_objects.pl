@@ -1,6 +1,4 @@
 #!/usr/bin/env perl
-# $Source: /tmp/ENSCOPY-ENSEMBL-KILLLIST/scripts/remove_kill_objects.pl,v $
-# $Revision: 1.2 $ 
 
 # This script allows a user to remove an entry (or entries)
 # from the ensembl_kill_list database if we decide that we 
