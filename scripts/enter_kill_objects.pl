@@ -1,5 +1,19 @@
 #!/usr/bin/env perl
 
+# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 =pod
 
@@ -51,7 +65,7 @@
   The command will look something like this:
 
     perl enter_kill_objects.pl -killer myname -file info.ls  \
-      -dbuser ensadmin -dbpass xxx -reasons Repetitive,Short \
+      -dbuser xxx -dbpass xxx -reasons Repetitive,Short \
       -for_genebuild_species 10090,9606 -for_genebuild_analyses xlaevis_cDNA,Vertrna
 
 =cut
@@ -119,9 +133,9 @@ my (
         );
 
 # kill_list database
-$dbname = 'ba1_ensembl_kill_list';
-$dbhost = 'genebuild6';
-$dbuser = 'ensadmin';
+$dbname = undef;
+$dbhost = undef;
+$dbuser = undef;
 $dbport = 3306, 
 $dbpass = undef;
 
