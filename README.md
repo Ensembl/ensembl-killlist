@@ -55,15 +55,15 @@ process.
                           +----------------+   |     +----------------+
                      ____1| kill_object_id |1__|____1| kill_object_id |
                      |    | taxon_id       |         | sequence       |
-+----------------+   |    | mol_type       |         +----------------+
-|   comment      |   |    | accession      |
-+----------------+   |    | version        |
-| comment_id     |   |    | external_db_id |1___     +------------------------+  
-| kill_object_id |n__|    | description    |    |    |      external_db       |
-| user_id        |1______1| user_id        |__  |    +------------------------+
-| time_added     |    |   +----------------+ |  |___1| external_db_id         |
-| message        |    |                      |       | db_name                |
-+----------------+    |                      |       | db_release             |
+ +----------------+  |    | mol_type       |         +----------------+
+ |   comment      |  |    | accession      |
+ +----------------+  |    | version        |
+ | comment_id     |  |    | external_db_id |1___     +------------------------+  
+ | kill_object_id |n_|    | description    |    |    |      external_db       |
+ | user_id        |1_____1| user_id        |__  |    +------------------------+
+ | time_added     |   |   +----------------+ |  |___1| external_db_id         |
+ | message        |   |                      |       | db_name                |
+ +----------------+   |                      |       | db_release             |
                       |                      |       | status                 |
                       |                      |       | dbprimary_acc_linkable |
                       |                      |       | display_label_linkable |
@@ -118,11 +118,11 @@ possible to tell the script that you only want to kill these accessions for huma
 only want to kill these accessions for TargettedGenewise.  
 
 Options:
-  -dbname                     # ba1_ensembl_kill_list (the db to which your cDNA or protein will be added)
-  -dbuser                     # ensadmin 
-  -dbhost                     # genebuild6
+  -dbname                     # the db to which your cDNA or protein will be added
+  -dbuser                     # database server username
+  -dbhost                     # database server
   -dbport                     # 3306
-  -dbpass                     # xxx
+  -dbpass                     # database server username
   -mole_dbnames               # check for latest releases (-hcbi3 -ugenero). Always enter at least one
                                 release previous to the latest too, as sometimes things aren't found 
                                 in the newest databases.
@@ -133,41 +133,41 @@ Options:
   -for_genebuild_analyses     # don't kill for these analyses. Give logic_names. (Add to kill_object_analysis table)
 
 * reasons: There is a set list of reasons in the database. You must choose one of these reasons:
-Alu             #       Alu repeats (5 AG/CT 3), subclass of SINEs
-Chimeric_cDNA   #       Predicted Chimeric cDNA
-Chimeric_clone  #       Chimeric clone
-Cytochrome      #       Cytochrome
-Env             #       Similar to Envelope protein
-Gag             #       Similar to Gag-protein
-HiThru          #       High-throughput, low quality
-Hypothetical    #       Hypothetical/putative protein
-L1              #       LINE-1 retrotransposon
-L1_transposable #       LINE-1 transposable element
-LINE            #       Long interspersed nuclear element (repeat)
-Long            #       Long
-Long_intron     #       Long intron
-LTR             #       Long terminal repeat
-Memory          #       Requires too much memory
-None            #       No reason given
-ORF             #       Open reading frame (ORF)
-Other           #       Other
-P40             #       P40
-Partial         #       Fragment/partial
-Pol             #       Similar to Pol protein
-Pro             #       Similar to Pro protein
-Promiscuous     #       Hit too many times
-Repetitive      #       Repetitive/low complexity
-Retained_intron #       Retained intron
-Riken           #       Riken
-RT              #       Reverse transcriptase
-Short           #       Short
-SINE            #       Short interspersed nuclear element (repeat)
-Testis          #       Testis
-Transposable_elements   #       Supports transposable elements
-Transposase     #       Transposase
-Un-genewiseable #       Un-genewiseable - predominantly ACTG
-Viral           #       Viral
-X               #       Too many X
+ Alu             #       Alu repeats (5 AG/CT 3), subclass of SINEs
+ Chimeric_cDNA   #       Predicted Chimeric cDNA
+ Chimeric_clone  #       Chimeric clone
+ Cytochrome      #       Cytochrome
+ Env             #       Similar to Envelope protein
+ Gag             #       Similar to Gag-protein
+ HiThru          #       High-throughput, low quality
+ Hypothetical    #       Hypothetical/putative protein
+ L1              #       LINE-1 retrotransposon
+ L1_transposable #       LINE-1 transposable element
+ LINE            #       Long interspersed nuclear element (repeat)
+ Long            #       Long
+ Long_intron     #       Long intron
+ LTR             #       Long terminal repeat
+ Memory          #       Requires too much memory
+ None            #       No reason given
+ ORF             #       Open reading frame (ORF)
+ Other           #       Other
+ P40             #       P40
+ Partial         #       Fragment/partial
+ Pol             #       Similar to Pol protein
+ Pro             #       Similar to Pro protein
+ Promiscuous     #       Hit too many times
+ Repetitive      #       Repetitive/low complexity
+ Retained_intron #       Retained intron
+ Riken           #       Riken
+ RT              #       Reverse transcriptase
+ Short           #       Short
+ SINE            #       Short interspersed nuclear element (repeat)
+ Testis          #       Testis
+ Transposable_elements   #       Supports transposable elements
+ Transposase     #       Transposase
+ Un-genewiseable #       Un-genewiseable - predominantly ACTG
+ Viral           #       Viral
+ X               #       Too many X
 
 Note that for -reasons, -for_genebuild_species and -for_genebuild_analyses you need to make sure that you enter the
 exact string (for -reason and -for_genebuild_analyses) or correct species number (for -for_genebuild_species)
@@ -175,9 +175,8 @@ in the commanline, or the script will not find these. Ditto for your -killer. Th
 have already been entered into the database; your commandline has to match the entries in the database. 
 
 Example command:
-  bsub -qyesterday -o enter_kill_objects_from_file.out -e enter_kill_objects_from_file.err \
-    perl enter_kill_objects_from_file.pl -dbuser ensadmin -dbpass xxx -file protein_accession.ls \ 
-    -killer ba1 -reason Chimeric_clone -for_genebuild_species 9606 -for_genebuild_analyses cDNA_update \ 
+  perl enter_kill_objects_from_file.pl -dbuser dbusername -dbpass xxx -file protein_accession.ls \ 
+    -killer userid -reason Chimeric_clone -for_genebuild_species 9606 -for_genebuild_analyses cDNA_update \ 
     -mole_dbnames embl_90,refseq_22,uniprot_10_2,embl_89,refseq_21,uniprot_10_1
 
 
@@ -195,18 +194,18 @@ Some scripts that make use of the ensembl_kill_list are:
 
 
 What you need:
-(i)   Mole and Kill_list_db API
+ (i)   Mole and Kill_list_db API
       Currently, all of the Mole and Kill_list_db API is stored in ensembl-personal/ba1/kill_list_db/modules/
       so this will need to be added to your PERL5LIB
-
-(ii)  /Bio/EnsEMBL/Pipeline/Config/GeneBuild/Databases.pm  
+ 
+ (ii)  /Bio/EnsEMBL/Pipeline/Config/GeneBuild/Databases.pm  
       GB_KILL_DBHOST             => 'dbserver',
       GB_KILL_DBNAME             => 'kill_list_DB',
       GB_KILL_DBUSER             => 'user',
       GB_KILL_DBPASS             => 'pass',
       GB_KILL_DBPORT             => '3306',
-
-(iii) /Bio/EnsEMBL/Pipeline/Config/GeneBuild/KillListFilter.pm 
+ 
+ (iii) /Bio/EnsEMBL/Pipeline/Config/GeneBuild/KillListFilter.pm 
       cDNA => {
         FILTER_PARAMS    => {
           -only_mol_type        => 'cDNA',
@@ -224,18 +223,18 @@ What you need:
       What do these options mean? The logic is a bit weird so read carefully.
       -only_mol_type         # only fetch accessions of this molecule type
                              # eg. 'cDNA' will return a list of cDNAs to be killed
-
+ 
       -user_id               # only fetch accessions entered by this user
                              # eg. 'user1' will return a list of accessions to be killed;
                              # all of these accession will have been added to the kill_list_DB by user1
-
+ 
       -from_source_species   # only fetch accessions where the cDNA or protein comes from this species
                              # eg. '9606' will return a kill list with only human cDNAs or proteins
-
+ 
       -before_date           # only fetch accessions entered into ba1_ensembl_kill_list before this date
                              # '2006.10.13' will return a list of accessions that were entered
                              # before 13 October 2006
-
+ 
       -having_status         # only fetch accessions having this status in kill_list_DB
                              # eg. 'UPDATED' will return a list of accession to be killed;
                              # all of these accessions will have current status set to 'UPDATED'
@@ -250,12 +249,12 @@ What you need:
                              # 1810  RefSeq peptide       
                              # 2000  UniProtKB/TrEMBL     
                              # 2200  UniProtKB/Swiss-Prot 
-
+ 
       -reasons               # for each of the reasons listed in the config, return a kill list of
                              # accessions that were killed for these reasons
                              # eg. ['Short'] will return a kill list of cDNAs or proteins that were
                              # killed because they were too short
-
+ 
       -for_analyses          # Opposite logic to the above options. For each of these analyses entered 
                              # in the config, delete accessions from the kill_list that have an entry in 
                              # kill_object_analysis for this analysis. 
@@ -267,7 +266,7 @@ What you need:
                              # (these entries that do not appear on the returned kill list would have been
                              # entered with the '-for_genebuild_analyses cDNA_update' option when running
                              # enter_kill_objects_from_file.pl)
-
+ 
       -for_species           # As above. For each of these species, delete accessions from
                              # the kill_list that have an entry in species_allowed table for this species
                              # (The species_allowed table stores accessions which should not be killed for 
@@ -278,12 +277,17 @@ What you need:
                              # (these entries that do not appear on the returned kill list would have been
                              # entered with the '-for_genebuild_species 9606' option when running
                              # enter_kill_objects_from_file.pl)
-
-
+ 
+ 
       (see also modules/Bio/EnsEMBL/KillList/Filter.pm
        and modules/Bio/EnsEMBL/KillList/KillList.pm)
-
-(iv)  /Bio/EnsEMBL/Pipeline/Config/GeneBuild/Pmatch.pm 
-
-(v)   /Bio/EnsEMBL/Pipeline/Config/GeneBuild/Scripts.pm
+ 
+ (iv)  /Bio/EnsEMBL/Pipeline/Config/GeneBuild/Pmatch.pm 
+ 
+ (v)   /Bio/EnsEMBL/Pipeline/Config/GeneBuild/Scripts.pm
       GB_KILL_LIST   => '',
+      
+      
+      
+      
+      
