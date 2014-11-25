@@ -19,7 +19,7 @@
 
 =head1 DESCRIPTION
 
-  Notes found at ensembl-doc/pipeline_docs/using_kill_list_database.txt
+  Notes found at https://github.com/Ensembl/ensembl-killlist
 
   This script allows a user to enter a killer,file or accession, and
   reason (along with the dbuser and dbpass). As long as all info
