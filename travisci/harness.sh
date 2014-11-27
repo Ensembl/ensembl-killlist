@@ -7,7 +7,8 @@ if [ "$COVERALLS" = 'true' ]; then
   PERL5OPT='-MDevel::Cover=+ignore,bioperl,+ignore,ensembl-test' perl $PWD/ensembl-test/scripts/runtests.pl -verbose $PWD/modules/t $SKIP_TESTS
 else
   # just test the basic syntax for all the scripts and modules
-  perl -c $PWD/scripts/*.pl
+  find $PWD/scripts -type f -name "*.pl" | xargs perl -c *
+  find $PWD/modules -type f -name "*.pm" | xargs perl -c *  
 fi
 rt=$?
 if [ $rt -eq 0 ]; then
