@@ -22,7 +22,7 @@ use Bio::EnsEMBL::Storable;
 
 use Bio::EnsEMBL::Utils::Exception qw(throw);
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);
-use Bio::EnsEMBL::KillList::DBSQL::ReasonAdaptor;
+
 
 @ISA = qw(Bio::EnsEMBL::Storable);
 
