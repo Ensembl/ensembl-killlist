@@ -8,7 +8,6 @@ if [ "$COVERALLS" = 'true' ]; then
 else
   # just test the basic syntax for all the scripts and modules
   find $PWD/ensembl-analysis/modules -type f -name '*.example' | while read f; do mv "$f" "${f%.example}"; done
-  find $PWD/ensembl-pipeline/modules -type f -name '*.example' | while read f; do mv "$f" "${f%.example}"; done
   find $PWD/scripts -type f -name "*.pl" | xargs -i perl -c {}
   find $PWD/modules -type f -name "*.pm" | xargs -i perl -c {} 
 fi
