@@ -884,7 +884,7 @@ sub load_registry_from_db{
 	$go_version = $1;
       }
     }
-    elsif($db =~ /^ba1_ensembl_kill_list_(\d+)/){ #elsif($db =~ /^ensembl_kill_list_(\d+)/){
+    elsif($db =~ /^gb_kill_list_(\d+)/){
       if($1 eq $software_version){
         $ensembl_kill_list_version = $1;
       }
