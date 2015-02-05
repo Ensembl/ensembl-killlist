@@ -23,16 +23,20 @@
 
   This script allows a user to enter a killer,file or accession, and
   reason (along with the dbuser and dbpass). As long as all info
-  required can be found in the Mole db, the entry is stored in the
-  ensembl_kill_list database.
+  required can be found in the Mole db, the entry is stored in all the
+  copies of the gb_kill_list database on the hosts in 'hosts'.
 
 =head2 Mole database names
 
-  To find the latest Mole dbanmes, do:
+  To find the latest Mole dbnames, do:
 
   mysql -ugenero -hcbi5d -Dmm_ini -e "select database_name from ini where available='yes' and current = 'yes'"
 
 =head1 OPTIONS
+
+  -dbname                   Kill-list database name.
+  
+  -dbhost                   Kill-list database host. Note that it just needs to be one of the hosts where a kill-list database is present. Kill-list database copies (same name, different host) will be updated if their hosts are specified in @hosts below. If option -only_one is used, this will be the only kill-list database updated.
 
   -dbuser                   User name to access the kill-list database
 
@@ -56,11 +60,9 @@
 
   [-for_genebuild_analyses] List of analyses the sequence was used in
 
+  [-only_one]               Enter kill list object in database on dbhost only. Do not update other copies on hosts in @hosts.
+
 =head1 EXAMPLES
-
-  Tag the following optional parameters on to the commandline too:
-
-    -for_genebuild_species, -for_genebuild_analyses
 
   The command will look something like this:
 
@@ -139,6 +141,22 @@ $dbuser = undef;
 $dbport = 3306, 
 $dbpass = undef;
 
+# kill_list database hosts
+my @hosts = (  'genebuild1',
+               'genebuild2',
+               'genebuild3',
+               'genebuild4',
+               'genebuild5',
+               'genebuild6',
+               'genebuild7',
+               'genebuild8',
+               'genebuild9',
+               'genebuild10',
+               'genebuild11',
+               'genebuild12',
+               'genebuild13',
+               );
+
 # Mole database
 my $mole_dbhost = 'cbi5d';
 my $mole_dbuser = 'genero';
@@ -146,6 +164,7 @@ my $mole_dbport = 3306;
 
 my @not_stored;
 my @stored;
+my $only_one = 0;
 
 GetOptions( 'dbname=s'                 => \$dbname,
             'dbuser=s'                 => \$dbuser,
@@ -160,8 +179,8 @@ GetOptions( 'dbname=s'                 => \$dbname,
             'reasons=s'                => \@reasons,
             'comments=s'               => \@comments,
             'for_genebuild_species=s'  => \@for_genebuild_species,
-            'for_genebuild_analyses=s' => \@for_genebuild_analyses, );
-
+            'for_genebuild_analyses=s' => \@for_genebuild_analyses,
+            'only_one!'                => \$only_one);
 
 # check db variables
 if ( !defined($dbname) || !defined($dbuser) || !defined($dbhost) || !defined($dbport)){ 
@@ -171,7 +190,15 @@ if ( !defined($dbpass)){
   die "ERROR: Please set -dbpass <XXXXX> \n"; 
 }
 
-print "You ($user_name) are writing to kill list database : $dbname \@ $dbhost \n" ; sleep(3);
+# if only_one option is true, modify the db on dbhost only
+if ($only_one) {
+  @hosts = ($dbhost);
+  print "You ($user_name) are writing to kill list database : $dbname \@ $dbhost \n"; 
+} else {
+  print "You ($user_name) are writing to kill list database : $dbname \@ $dbhost and its copies on ".join(", ", @hosts)."\n";
+}
+
+sleep(3);
 
 if ( !defined($file) && !defined $accession ) {
   die "Please enter accession or file name, with each line containing accession_version acession molecule_type sequence description\n";
@@ -527,16 +554,27 @@ foreach my $new_evidence (@evidence_to_store) {
                "  sequence         : ".$new_evidence->sequence->sequence      ."\n".
                "  description      : ".$new_evidence->description   ."\n";
 
-  eval {
-    $evidence_dbID = $kill_adaptor->store($new_evidence, 0, 1);
-  };
-  if ($@) {
-    push @not_stored, $new_evidence->accession;
-    warning("Unable to store ".$new_evidence->accession."\n".$@); 
-  } else {
-    push @stored,$new_evidence->accession;
-    print_stored($db, $evidence_dbID);
-  }
+  foreach my $host (@hosts) {
+  	my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new(
+        '-dbname' => $dbname,
+        '-host'   => $host,
+        '-user'   => $dbuser,
+        '-port'   => $dbport,
+        '-pass'   => $dbpass,
+    );
+    $kill_adaptor = $db->get_KillObjectAdaptor();
+    
+    eval {
+      $evidence_dbID = $kill_adaptor->store($new_evidence, 0, 1);
+    };
+    if ($@) {
+      push @not_stored, $new_evidence->accession;
+      warning("Unable to store ".$new_evidence->accession." on $host. Please, make sure the kill list databases on all hosts are still in sync"."\n".$@); 
+    } else {
+      push @stored,$new_evidence->accession;
+      print_stored($db, $evidence_dbID);
+    }
+  } # foreach host
 }
 
 print "\nStored accessions:\n==================\n";
@@ -629,6 +667,7 @@ sub get_check_reason {
 sub print_stored {
   my ($db, $evidence_dbID) = @_;
 
+  print STDERR "  Database -> ".$db->dbname()."@".$db->host()."\n";
   print STDERR "  Species_allowed  ->\n";
   foreach my $species (@{$db->get_SpeciesAdaptor->fetch_all_by_KillObject($kill_adaptor->fetch_by_dbID($evidence_dbID))}) {
     print STDERR "                   : ".$species->name."\n";

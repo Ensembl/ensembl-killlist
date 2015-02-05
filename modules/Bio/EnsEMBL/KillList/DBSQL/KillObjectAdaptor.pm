@@ -791,7 +791,7 @@ sub store {
     # we may have passed in a status 
     # if so, we don't want to over-write it
     if (!defined $status || $status == 0) {
-      $status = "CREATED";
+        $status = "CREATED" unless ($status eq "REMOVED");
     }
   } 
   print STDOUT "THIS IS THE UNION\n" if ($stored_dbID);

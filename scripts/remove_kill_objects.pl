@@ -29,8 +29,6 @@
 # ACCOUNT. This is because the generation of a kill-list also
 # strips off the versions.
 
-# The command will look something like this:
-
 use strict;
 use warnings;
 use Getopt::Long;
@@ -59,6 +57,24 @@ $dbhost = undef ;
 $dbuser = undef ;
 $dbport = 3306, 
 
+# kill_list database hosts
+my @hosts = (  'genebuild1',
+               'genebuild2',
+               'genebuild3',
+               'genebuild4',
+               'genebuild5',
+               'genebuild6',
+               'genebuild7',
+               'genebuild8',
+               'genebuild9',
+               'genebuild10',
+               'genebuild11',
+               'genebuild12',
+               'genebuild13',
+               );
+
+my $only_one = 0;
+
 &GetOptions(
         'dbname=s'                 => \$dbname,
         'dbuser=s'                 => \$dbuser,
@@ -67,6 +83,7 @@ $dbport = 3306,
         'dbpass=s'                 => \$dbpass,
         'file=s'                   => \$file,
         'accession=s'              => \$accession,
+        'only_one!'                => \$only_one
 );
 
 # check db variables
@@ -83,6 +100,14 @@ if ( defined $file && defined $accession) {
   die "Enter either accession OR file. Not both.\n";
 }
 
+# if only_one option is true, modify the db on dbhost only
+if ($only_one) {
+  @hosts = ($dbhost);
+  print "Writing to kill list database : $dbname \@ $dbhost \n"; 
+} else {
+  print "Writing to kill list database : $dbname \@ $dbhost and its copies on ".join(", ", @hosts)."\n";
+}
+
 # connect to kill_list db
 my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new(
         '-dbname' => $dbname,
@@ -91,9 +116,6 @@ my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new(
         '-port'   => $dbport,
         '-pass'   => $dbpass,
 );
-
-# get Kill list adaptors
-my $kill_adaptor = $db->get_KillObjectAdaptor();
 
 my @accessions;
 if (defined $file) {
@@ -109,31 +131,45 @@ if (defined $file) {
   push @accessions, $accession;
 }
 
-# one by one, remove these items. This means:
-# First, take all existing entries and update is_current to '0'
-# The re-store this object with status = 'REMOVED'
-foreach my $accession_version (@accessions) {
-  # strip off the version
-  my $no_version = $accession_version;
-  $no_version =~ s/\.\d+//;
+foreach my $host (@hosts) {
+  my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new(
+        '-dbname' => $dbname,
+        '-host'   => $host,
+        '-user'   => $dbuser,
+        '-port'   => $dbport,
+        '-pass'   => $dbpass,
+  );
+  
+  # get Kill list adaptor
+  my $kill_adaptor = $db->get_KillObjectAdaptor();
+  
+  # one by one, remove these items. This means:
+  # First, take all existing entries and update is_current to '0'
+  # The re-store this object with status = 'REMOVED'
+  foreach my $accession_version (@accessions) {
+    # strip off the version
+    my $no_version = $accession_version;
+    $no_version =~ s/\.\d+//;
 
-  # do a full fetch
-  my $kill_object = $kill_adaptor->fetch_by_accession($no_version,1);
-  print STDERR "Fetched $no_version fom database:\n";
-  #  print Dumper($kill_object);
-  print_stored($db,$kill_object->dbID);
+    # do a full fetch
+    my $kill_object = $kill_adaptor->fetch_by_accession($no_version,1);
+    print STDERR "Fetched $no_version from database:\n";
+    # print Dumper($kill_object);
+    print_stored($db,$kill_object->dbID,$kill_adaptor);
 
-  # remove
-  print STDERR "Removing...\n";
-  my $new_kill_obj_dbID = $kill_adaptor->remove($kill_object); 
-  my $new_kill_object = $kill_adaptor->fetch_by_dbID($new_kill_obj_dbID, 1); 
-  #  print Dumper($new_kill_object);
-  print_stored($db,$new_kill_obj_dbID);
-}
+    # remove
+    print STDERR "Removing...\n";
+    my $new_kill_obj_dbID = $kill_adaptor->remove($kill_object); 
+    my $new_kill_object = $kill_adaptor->fetch_by_dbID($new_kill_obj_dbID, 1); 
+    #  print Dumper($new_kill_object);
+    print_stored($db,$new_kill_obj_dbID,$kill_adaptor);
+  } # foreach accession_version
+} # foreach host
 
 sub print_stored {
-  my ($db, $evidence_dbID) = @_;
+  my ($db, $evidence_dbID, $kill_adaptor) = @_;
 
+  print STDERR "  Database -> ".$db->dbname()."@".$db->host()."\n";
   print STDERR "  Species_allowed  ->\n";
   foreach my $species (@{$db->get_SpeciesAdaptor->fetch_all_by_KillObject($kill_adaptor->fetch_by_dbID($evidence_dbID))}) {
     print STDERR "                   : ".$species->name."\n";
