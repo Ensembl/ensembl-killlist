@@ -24,17 +24,17 @@ use vars qw (@ISA);
 
 =head2
 
-  Arg[1]      :  
+  Arg[1]      :
   Example     :
   Description :
-  Return type : 
+  Return type :
   Exceptions  :
   Caller      :
   Status      :
 
 =cut
 sub new {
-  my($class,@args) = @_; 
+  my($class,@args) = @_;
 
   my $self = bless {},$class;
 
@@ -45,11 +45,35 @@ sub new {
                         FILTER_PARAMS
                         )],@args);
 
-  if (!defined($type)) {throw " ERROR: need to set -type\n";}
-  $self->type          ( $type );
-  $self->GB_REF_DB     ( $gb_ref_db ) if ( defined $gb_ref_db );
-  $self->KILL_LIST_DB  ( $kill_list_db ) if ( defined $kill_list_db );
-  $self->FILTER_PARAMS ( $filter_params ) if ( defined $filter_params );
+  if (!defined($type)) {
+     throw("You are trying to make a killlist object and have not passed in a molecule type. Make sure you have the appropriate ".
+           "flag set in you config");
+  }
+
+  $self->TYPE($type);
+  say "TYPE SET: ".$type;
+
+  $self->GB_REF_DB($gb_ref_db) if ( defined $gb_ref_db );
+  $self->KILL_LIST_DB($kill_list_db) if ( defined $kill_list_db );
+  $self->FILTER_PARAMS($filter_params) if (defined $filter_params);
+
+  # If nothing was passed in then use the defaults based on type
+  if(!defined $filter_params) {
+    if($self->TYPE eq 'protein') {
+      $filter_params = {
+                         -only_mol_type        => 'protein',
+                         -user_id              => undef,
+                         -from_source_species  => undef,
+                         -before_date          => undef,
+                         -having_status        => undef,
+                         -reasons              => [],
+                         -for_analyses         => [],
+                         -for_species          => [],
+                         -for_external_db_ids  => [],
+                       };
+      $self->FILTER_PARAMS($filter_params);
+    }
+  }
 
   return $self; # success - we hope!
 }
@@ -65,10 +89,10 @@ sub new {
   Status      :
 
 =cut
-sub type {
+sub TYPE {
   my $self = shift;
-  $self->{'type'} = shift if ( @_ );
-  return $self->{'type'};
+  $self->{'TYPE'} = shift if ( @_ );
+  return $self->{'TYPE'};
 }
 
 =head2
@@ -138,7 +162,7 @@ sub FILTER_PARAMS {
     $self->{'FILTER_PARAMS'} = {};
   }
   if ( $filter_params ) {
-    throw("Must pass KillList:FILTER_PARAMS a hashref not a ".$filter_params)
+    throw("Must pass HiveKillList:FILTER_PARAMS a hashref not a ".$filter_params)
       unless(ref($filter_params) eq 'HASH');
     $self->{'FILTER_PARAMS'} = $filter_params;
   }
