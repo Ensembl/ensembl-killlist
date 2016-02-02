@@ -44,7 +44,7 @@ CREATE TABLE kill_object (
   KEY moltype_idx (mol_type),
   KEY accession_idx (accession)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -60,7 +60,7 @@ CREATE TABLE sequence (
 
   PRIMARY KEY (kill_object_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -79,7 +79,7 @@ CREATE TABLE kill_object_status (
 
   PRIMARY KEY (kill_object_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -97,7 +97,7 @@ CREATE TABLE kill_object_reason (
   KEY kill_object (kill_object_id),
   KEY reason (reason_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -115,7 +115,7 @@ CREATE TABLE reason (
   PRIMARY KEY (reason_id),
   KEY why_idx (why)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -133,7 +133,7 @@ CREATE TABLE kill_object_analysis (
   KEY kill_object (kill_object_id),
   KEY analysis (analysis_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -151,7 +151,7 @@ CREATE TABLE analysis (
 
   PRIMARY KEY (analysis_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -178,7 +178,7 @@ CREATE TABLE external_db (
 
   PRIMARY KEY (external_db_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -195,7 +195,7 @@ CREATE TABLE species (
 
   PRIMARY KEY (taxon_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -213,7 +213,7 @@ CREATE TABLE species_allowed (
   KEY species (taxon_id),
   KEY kill_object (kill_object_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -233,7 +233,7 @@ CREATE TABLE user (
   PRIMARY KEY (user_id),
   KEY team (team_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 
@@ -249,7 +249,7 @@ CREATE TABLE team (
 
   PRIMARY KEY (team_id)
  
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
 ################################################################################
@@ -269,6 +269,6 @@ CREATE TABLE comment (
   KEY user (user_id),
   KEY kill_object (kill_object_id)
 
-) COLLATE=latin1_swedish_ci TYPE=MyISAM;
+) COLLATE=latin1_swedish_ci ENGINE=MyISAM;
 
 
