@@ -16,28 +16,16 @@ package Bio::EnsEMBL::KillList::KillList;
 
 use strict;
 use warnings;
+use feature 'say';
 
-use Data::Dumper;
-
-use Bio::EnsEMBL::Analysis::Config::GeneBuild::KillListFilter; 
-use Bio::EnsEMBL::Analysis::Config::Databases;
-use Bio::EnsEMBL::Analysis::Tools::Utilities;
-use Bio::EnsEMBL::KillList::AnalysisLite;
-use Bio::EnsEMBL::KillList::Comment;
 use Bio::EnsEMBL::KillList::Filter;
-use Bio::EnsEMBL::KillList::KillObject;
-use Bio::EnsEMBL::KillList::Reason;
-use Bio::EnsEMBL::KillList::Sequence;
-use Bio::EnsEMBL::KillList::Species;
-use Bio::EnsEMBL::KillList::Team;
-use Bio::EnsEMBL::KillList::User;
 use Bio::EnsEMBL::KillList::DBSQL::DBAdaptor;
-use Bio::EnsEMBL::Utils::Exception qw(throw warning);
+use Bio::EnsEMBL::Utils::Exception qw(throw);
 use Bio::EnsEMBL::Utils::Argument qw(rearrange);
 
-use vars qw (@ISA);
-@ISA = qw();
-
+my $KILLLIST_CONFIG = 'Bio::EnsEMBL::Analysis::Config::GeneBuild::KillListFilter';
+my $ANALYSIS_UTILITIES = 'Bio::EnsEMBL::Analysis::Tools::Utilities';
+my $DATABASE_CONFIG = 'Bio::EnsEMBL::Analysis::Config::Databases';
 
 =head2
 
@@ -62,13 +50,47 @@ sub new {
                         FILTER_PARAMS
                         )],@args);
 
-  if (!defined($type)) {throw " ERROR: need to set -type\n";}
+  if (!defined($type)) {
+     throw("You are trying to make a killlist object and have not passed in a molecule type. ".
+           "Make sure you have the appropriate flag set in you config");
+  }
   $self->type          ( $type );
   $self->ref_db        ( $gb_ref_db ) if ( defined $gb_ref_db ); #check this 
   $self->KILL_LIST_DB  ( $kill_list_db ) if ( defined $kill_list_db );
   $self->FILTER_PARAMS ( $filter_params ) if ( defined $filter_params );
 
-  $self->read_and_check_config($KILL_LIST_CONFIG_BY_LOGIC);
+  eval "use $KILLLIST_CONFIG";
+  if (@$) {
+    if(!defined $filter_params) {
+      $filter_params = {
+                         -only_mol_type        => $self->TYPE,
+                         -user_id              => undef,
+                         -from_source_species  => undef,
+                         -before_date          => undef,
+                         -having_status        => undef,
+                         -reasons              => [],
+                         -for_analyses         => [],
+                         -for_species          => [],
+                         -for_external_db_ids  => [],
+                       };
+      $self->FILTER_PARAMS($filter_params);
+    }
+  }
+  else {
+    my $KILL_LIST_CONFIG_BY_LOGIC;
+    my $DATABASES;
+    eval "use $ANALYSIS_UTILITIES";
+    if ($@) {
+        throw("Could not load $ANALYSIS_UTILITIES\n$@");
+    }
+    eval "use $DATABASE_CONFIG";
+    if ($@) {
+        throw("Could not load $DATABASE_CONFIG\n$@");
+    }
+    $self->KILL_LIST_DB($DATABASES->{KILL_LIST_DB});
+    $self->read_and_check_config($KILL_LIST_CONFIG_BY_LOGIC);
+
+  }
 
   return $self; # success - we hope!
 }
@@ -245,10 +267,9 @@ sub read_and_check_config {
 sub get_kill_list {
   my ($self) = @_;
 
-  print "\nUsing kill-list-db : " . $DATABASES->{KILL_LIST_DB}->{"-dbname"} . " \@ " . $DATABASES->{KILL_LIST_DB}->{"-host"} . "\n";
+  print "\nUsing kill-list-db : " . $self->KILL_LIST_DB->{"-dbname"} . " \@ " . $self->KILL_LIST_DB->{"-host"} . "\n";
 
-  my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $DATABASES->{KILL_LIST_DB} }) ;
-  $db->dbc->disconnect_when_inactive(1); 
+  my $db = Bio::EnsEMBL::KillList::DBSQL::DBAdaptor->new( %{ $self->KILL_LIST_DB }) ;
   #get the kill_list filter
   my %filter_params = %{$self->FILTER_PARAMS};
 #  foreach my $key (keys %filter_params) {
@@ -267,6 +288,7 @@ sub get_kill_list {
   my $status = $filter_params{'-having_status'};
   my $mol_type = $filter_params{'-only_mol_type'};
 
+  say "get_kill_list, MOL TYPE: ".$mol_type;
 
   my (@reasons, @analyses, @species, @external_db_ids);
   foreach my $id (@{$filter_params{'-reasons'}}) {
