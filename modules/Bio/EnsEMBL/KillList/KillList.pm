@@ -60,10 +60,10 @@ sub new {
   $self->FILTER_PARAMS ( $filter_params ) if ( defined $filter_params );
 
   eval "use $KILLLIST_CONFIG";
-  if (@$) {
+  if ($@) {
     if(!defined $filter_params) {
       $filter_params = {
-                         -only_mol_type        => $self->TYPE,
+                         -only_mol_type        => $self->type,
                          -user_id              => undef,
                          -from_source_species  => undef,
                          -before_date          => undef,
@@ -77,8 +77,6 @@ sub new {
     }
   }
   else {
-    my $KILL_LIST_CONFIG_BY_LOGIC;
-    my $DATABASES;
     eval "use $ANALYSIS_UTILITIES";
     if ($@) {
         throw("Could not load $ANALYSIS_UTILITIES\n$@");
@@ -87,8 +85,12 @@ sub new {
     if ($@) {
         throw("Could not load $DATABASE_CONFIG\n$@");
     }
-    $self->KILL_LIST_DB($DATABASES->{KILL_LIST_DB});
-    $self->read_and_check_config($KILL_LIST_CONFIG_BY_LOGIC);
+# I have to use the package name to get the values needed. 'no warnings' suppress the 'used only once' warning
+    no warnings qw(once);
+    $self->read_and_check_config($Bio::EnsEMBL::KillList::KillList::KILL_LIST_CONFIG_BY_LOGIC);
+    if (ref($self->KILL_LIST_DB) ne 'HASH') {
+      $self->KILL_LIST_DB($Bio::EnsEMBL::KillList::KillList::DATABASES->{$self->KILL_LIST_DB});
+    }
 
   }
 
