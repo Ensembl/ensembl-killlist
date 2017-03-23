@@ -286,7 +286,7 @@ sub get_kill_list {
   #my $filter = Bio::EnsEMBL::KillList::Filter->new(%filter_params);
 
   #get objects where required 
-  my $source_spp = $db->get_SpeciesAdaptor->fetch_by_dbID($filter_params{'-source_species'}) if ($filter_params{'-source_species'});
+  my $source_spp = $db->get_SpeciesAdaptor->fetch_by_dbID($filter_params{'-from_source_species'}) if ($filter_params{'-from_source_species'});
   my $date = $filter_params{'-before_date'};
   my $status = $filter_params{'-having_status'};
   my $mol_type = $filter_params{'-only_mol_type'};
