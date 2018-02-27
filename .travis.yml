@@ -18,7 +18,7 @@ before_install:
     - git clone --branch release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
 
 install:
-    - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
+    - cpanm --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
  
 script: "./travisci/harness.sh"
 
