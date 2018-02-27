@@ -1,24 +1,21 @@
 language: "perl"
 
 perl:
+  - "5.26"
+  - "5.22"
+  - "5.18"
   - "5.14"
+  - "5.10"
 
 env:
+  - COVERALLS=false
 
 sudo: false
-
-addons:
-    apt:
-        packages:
-        - unzip
 
 before_install:
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-external.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-analysis.git
-    - wget https://github.com/bioperl/bioperl-live/archive/bioperl-release-1-2-3.zip
-    - unzip bioperl-release-1-2-3.zip
-
+    - git clone --branch release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
