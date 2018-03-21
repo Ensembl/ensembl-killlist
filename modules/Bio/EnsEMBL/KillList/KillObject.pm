@@ -395,7 +395,7 @@ sub add_Analysis_allowed {
 
 sub get_all_Analyses_allowed {
   my ($self) = @_;
-  if (!defined $self->{'_analysis_array'} && defined $self->adaptor()) {
+  if (!exists $self->{'_analysis_array'} && defined $self->adaptor()) {
     $self->{'_analysis_array'} = $self->adaptor()->db()->get_AnalysisLiteAdaptor()->fetch_all_by_KillObject($self);
   }
   return $self->{'_analysis_array'};

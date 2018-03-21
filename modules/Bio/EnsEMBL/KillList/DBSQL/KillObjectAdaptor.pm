@@ -679,9 +679,10 @@ sub get_union {
     #get the current settings
     #add new things to the union that occur in current and not in new
     #reasons:
+    my $new_reasons = $new->get_all_Reasons();
     foreach my $reason1 (@{$current->get_all_Reasons()}) {
       my $found;
-      foreach my $reason2 (@{$new->get_all_Reasons()}) {
+      foreach my $reason2 (@$new_reasons) {
         if ($reason1->dbID == $reason2->dbID) {
           $found = 1;
           last;
@@ -692,9 +693,10 @@ sub get_union {
       }
     }
     #species allowed:
+    my $new_species = $new->get_all_Species_allowed();
     foreach my $species1 (@{$current->get_all_Species_allowed()}) {
       my $found;
-      foreach my $species2 (@{$new->get_all_Species_allowed()}) {
+      foreach my $species2 (@{$new_species}) {
         if ($species1->dbID == $species2->dbID) {
           $found = 1;
           last;
@@ -705,9 +707,10 @@ sub get_union {
       }
     }
     #analyses:
+    my $new_analyses = $new->get_all_Analyses_allowed();
     foreach my $analysis1 (@{$current->get_all_Analyses_allowed()}) {
       my $found;
-      foreach my $analysis2 (@{$new->get_all_Analyses_allowed()}) {
+      foreach my $analysis2 (@{$new_analyses}) {
         if ($analysis1->dbID == $analysis2->dbID) {
           $found = 1;
           last;
@@ -718,9 +721,10 @@ sub get_union {
       }
     }
    #comments:
+    my $new_comments = $new->get_all_Comments();
     foreach my $comment1 (@{$current->get_all_Comments()}) {
       my $found;
-      foreach my $comment2 (@{$new->get_all_Comments()}) {
+      foreach my $comment2 (@{$new_comments}) {
         if ($comment1->dbID == $comment2->dbID) {
           $found = 1;
           last;
@@ -792,7 +796,7 @@ sub store {
     # we may have passed in a status 
     # if so, we don't want to over-write it
     if (!defined $status || $status == 0) {
-        $status = "CREATED" unless ($status eq "REMOVED");
+        $status = "CREATED";
     }
   } 
   print STDOUT "THIS IS THE UNION\n" if ($stored_dbID);
@@ -854,38 +858,44 @@ sub store {
   }
 
   # add analyses
-  my %tmp_analyses;
-  # ensure no duplicates
-  foreach my $analysis (@{$obj_to_store->get_all_Analyses_allowed()}) { 
-    $tmp_analyses{$analysis} = $analysis;
-  }
-  foreach my $analysis (keys %tmp_analyses) {
-    print STDERR "Adding analysis $analysis\n";
-    $sth = $self->prepare(
-           "INSERT INTO kill_object_analysis ".
-           "(kill_object_id, analysis_id) ".
-           "VALUES (?, ?)");
-    $sth->bind_param(1, $kill_obj_dbID, SQL_INTEGER);
-    $sth->bind_param(2, $tmp_analyses{$analysis}->dbID, SQL_INTEGER);
-    $sth->execute();
-    $sth->finish();
+  my $analyses = $obj_to_store->get_all_Analyses_allowed();
+  if ($analyses) {
+    my %tmp_analyses;
+    # ensure no duplicates
+    foreach my $analysis (@{$analyses}) {
+      $tmp_analyses{$analysis} = $analysis;
+    }
+    foreach my $analysis (keys %tmp_analyses) {
+      print STDERR "Adding analysis $analysis\n";
+      $sth = $self->prepare(
+             "INSERT INTO kill_object_analysis ".
+             "(kill_object_id, analysis_id) ".
+             "VALUES (?, ?)");
+      $sth->bind_param(1, $kill_obj_dbID, SQL_INTEGER);
+      $sth->bind_param(2, $tmp_analyses{$analysis}->dbID, SQL_INTEGER);
+      $sth->execute();
+      $sth->finish();
+    }
   }
 
   # add species allowed
-  my %tmp_species;
-  # ensure no duplicates
-  foreach my $species (@{$obj_to_store->get_all_Species_allowed()}) {
-    $tmp_species{$species} = $species;
-  }
-  foreach my $species (keys %tmp_species) {
-    $sth = $self->prepare(
-           "INSERT INTO species_allowed ".
-           "(taxon_id, kill_object_id) ".
-           "VALUES (?, ?)");
-    $sth->bind_param(1, $tmp_species{$species}->taxon_id, SQL_INTEGER);
-    $sth->bind_param(2, $kill_obj_dbID, SQL_INTEGER);
-    $sth->execute();
-    $sth->finish(); 
+  my $species_allowed = $obj_to_store->get_all_Species_allowed();
+  if ($species_allowed) {
+    my %tmp_species;
+    # ensure no duplicates
+    foreach my $species (@{$species_allowed}) {
+      $tmp_species{$species} = $species;
+    }
+    foreach my $species (keys %tmp_species) {
+      $sth = $self->prepare(
+             "INSERT INTO species_allowed ".
+             "(taxon_id, kill_object_id) ".
+             "VALUES (?, ?)");
+      $sth->bind_param(1, $tmp_species{$species}->taxon_id, SQL_INTEGER);
+      $sth->bind_param(2, $kill_obj_dbID, SQL_INTEGER);
+      $sth->execute();
+      $sth->finish();
+    }
   }
 
   # add sequence
